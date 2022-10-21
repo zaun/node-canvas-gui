@@ -1,0 +1,29 @@
+{
+  "name": "node-canvas-gui",
+  "version": "0.0.1",
+  "description": "Offering a set of UI elements to be used with the canvas",
+  "type": "module",
+  "keywords": [
+    "canvas",
+    "gui"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zaun/node-canvas-gui"
+  },
+  "main": "src/index.js",
+  "scripts": {
+    "example": "node example/index.js"
+  },
+  "dependencies": {
+    "synchronized-promise": "^0.3.1"
+  },
+  "devDependencies": {
+    "@kmamal/sdl": "^0.4.x",
+    "node": "lts"
+  },
+  "peerDependencies": {
+    "canvas": "^2.10.1"
+  }
+}
