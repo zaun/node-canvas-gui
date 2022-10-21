@@ -1,5 +1,3 @@
-"use strict"
-
 import crypto from 'crypto';
 import EventSource from './EventSource.js';
 import Theme from './Theme.js';
@@ -20,8 +18,8 @@ export default class Widget extends EventSource {
   #backgroundColor = '#00000000';
   #borderColor = '#000000';
 
-  #fixedWidth = 0
-  #fixedHeight = 0
+  #fixedWidth = 0;
+  #fixedHeight = 0;
 
   #padding = {
     t: 0,
@@ -32,7 +30,7 @@ export default class Widget extends EventSource {
 
   // extended classes need access to these.
   _absolutePosition = false;
-  _parent = null; 
+  _parent = null;
   _theme = null;
   _mousePosX = 0;
   _mousePosY = 0;
@@ -61,8 +59,8 @@ export default class Widget extends EventSource {
     this.#name = name;
 
     if (themeColor) {
-      if (themeColor == Theme.Colors.Inherit) {
-        this._theme = null
+      if (themeColor === Theme.Colors.Inherit) {
+        this._theme = null;
       } else {
         this._theme = new Theme(themeColor);
       }
@@ -75,17 +73,13 @@ export default class Widget extends EventSource {
     }
 
     if (new.target === Widget) {
-      Object.preventExtensions(this)
+      Object.preventExtensions(this);
     }
   }
 
-  get backgroundColor() {
-    return this.#backgroundColor;
-  }
-
   get body() {
-    let w = this.#fixedWidth === 0 ? this._container.w : this.fixedWidth;
-    let h = this.#fixedHeight === 0 ? this._container.h : this.fixedHeight;
+    const w = this.#fixedWidth === 0 ? this._container.w : this.fixedWidth;
+    const h = this.#fixedHeight === 0 ? this._container.h : this.fixedHeight;
     return {
       x: this._container.x + this.#padding.l,
       y: this._container.y + this.#padding.t,
@@ -96,14 +90,6 @@ export default class Widget extends EventSource {
 
   get container() {
     return this._container;
-  }
-
-  get fixedHeight() {
-    return this.#fixedHeight;
-  }
-
-  get fixedWidth() {
-    return this.#fixedWidth;
   }
 
   get padding() {
@@ -122,24 +108,12 @@ export default class Widget extends EventSource {
     return this.#name;
   }
 
-  get parent() {
-    return this._parent;
-  }
-
-  get theme() {
-    if (this._theme === null) {
-      if (this._parent !== null) {
-        return this._parent.theme;
-      } else {
-        return new Theme(Theme.Colors.Blue);
-      }
-    } else {
-      return this._theme;
-    }
-  }
-
   get visible() {
     return this.#visible;
+  }
+
+  get backgroundColor() {
+    return this.#backgroundColor;
   }
 
   set backgroundColor(val) {
@@ -156,8 +130,12 @@ export default class Widget extends EventSource {
     this.#backgroundColor = color;
   }
 
+  get borderColor() {
+    return this.#borderColor;
+  }
+
   set borderColor(val) {
-    let color = val;
+    const color = val;
     if (color[0] !== '#') {
       return;
     }
@@ -165,6 +143,10 @@ export default class Widget extends EventSource {
       return;
     }
     this.#borderColor = color;
+  }
+
+  get fixedHeight() {
+    return this.#fixedHeight;
   }
 
   set fixedHeight(val) {
@@ -176,6 +158,10 @@ export default class Widget extends EventSource {
     }
   }
 
+  get fixedWidth() {
+    return this.#fixedWidth;
+  }
+
   set fixedWidth(val) {
     if (this.#fixedWidth !== val) {
       this.#fixedWidth = val;
@@ -185,6 +171,10 @@ export default class Widget extends EventSource {
     }
   }
 
+  get parent() {
+    return this._parent;
+  }
+
   set parent(val) {
     this._parent = val;
     if (this._parent && this._parent._performLayout) {
@@ -192,10 +182,20 @@ export default class Widget extends EventSource {
     }
   }
 
+  get theme() {
+    if (this._theme === null) {
+      if (this._parent !== null) {
+        return this._parent.theme;
+      }
+      return new Theme(Theme.Colors.Blue);
+    }
+    return this._theme;
+  }
+
   set theme(val) {
     if (val) {
       if (val === Theme.Colors.Inherit) {
-        this._theme = null
+        this._theme = null;
       } else {
         this._theme = new Theme(val);
       }
@@ -217,10 +217,10 @@ export default class Widget extends EventSource {
     this._mousePosX = event.x;
     this._mousePosY = event.y;
     if (
-      this._mousePosX > this._container.x &&
-      this._mousePosX < this._container.x + this._container.w &&
-      this._mousePosY > this._container.y &&
-      this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this._container.x
+      && this._mousePosX < this._container.x + this._container.w
+      && this._mousePosY > this._container.y
+      && this._mousePosY < this._container.y + this._container.h
     ) {
       this._mouseHover = true;
     } else {
@@ -230,10 +230,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonDown() {
     if (
-      this._mousePosX > this._container.x &&
-      this._mousePosX < this._container.x + this._container.w &&
-      this._mousePosY > this._container.y &&
-      this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this._container.x
+      && this._mousePosX < this._container.x + this._container.w
+      && this._mousePosY > this._container.y
+      && this._mousePosY < this._container.y + this._container.h
     ) {
       this._mouseDown = true;
     } else {
@@ -244,10 +244,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonUp() {
     if (
-      this._mousePosX > this._container.x &&
-      this._mousePosX < this._container.x + this._container.w &&
-      this._mousePosY > this._container.y &&
-      this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this._container.x
+      && this._mousePosX < this._container.x + this._container.w
+      && this._mousePosY > this._container.y
+      && this._mousePosY < this._container.y + this._container.h
     ) {
       this._mouseDown = true;
       this._mouseClick = true;
@@ -259,10 +259,10 @@ export default class Widget extends EventSource {
 
   setContainer(x, y, w, h) {
     if (
-      this._container.x !== x ||
-      this._container.y !== y ||
-      this._container.w !== w ||
-      this._container.h !== h
+      this._container.x !== x
+      || this._container.y !== y
+      || this._container.w !== w
+      || this._container.h !== h
     ) {
       this._container.x = x;
       this._container.y = y;
@@ -285,24 +285,26 @@ export default class Widget extends EventSource {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _performLayout() { }
 
   _logme(depth) {
     if (!Widget.#debug) {
-      return;      
+      return;
     }
+    // eslint-disable-next-line no-console
     console.log(`${'   '.repeat(depth)}${this.constructor.name} ${this.name} ${JSON.stringify(this.container)}`);
   }
 
-  _preDraw(canvasCtx, depth) {
+  _preDraw(canvasCtx) {
     if (this._mouseClick && this._onMouseClick !== null) {
       if (this._onMouseClick() === true) {
         let p = this._parent;
-        while(p !== null) {
+        while (p !== null) {
           p._mouseClick = false;
           p = p._parent;
         }
-      };
+      }
     }
     this._mouseClick = false;
 
@@ -310,7 +312,12 @@ export default class Widget extends EventSource {
     if (alpha !== '00') {
       canvasCtx.save();
       canvasCtx.fillStyle = this.#backgroundColor;
-      canvasCtx.fillRect(this._container.x, this._container.y, this._container.w, this._container.h);
+      canvasCtx.fillRect(
+        this._container.x,
+        this._container.y,
+        this._container.w,
+        this._container.h,
+      );
       canvasCtx.restore();
     }
   }
@@ -321,6 +328,7 @@ export default class Widget extends EventSource {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   _postDraw() {
     // canvasCtx.save();
     // canvasCtx.beginPath();

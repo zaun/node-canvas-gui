@@ -1,3 +1,6 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable import/no-extraneous-dependencies */
+
 import sdl from '@kmamal/sdl';
 import { setTimeout } from 'timers/promises';
 import Canvas from 'canvas';
@@ -20,15 +23,15 @@ global.window = sdl.video.createWindow({
   width: 1280,
   height: 720,
   resizable: false,
-	vsync: true,
-	accelerated: true,
+  vsync: true,
+  accelerated: true,
 });
 global.window.setTitle('node-canvas-gui example');
 
 // Setup the node-canvas framebuffer
-let { width, height } = global.window;
-let windowCanvas = Canvas.createCanvas(width, height);
-let windowContext = windowCanvas.getContext('2d');
+const { width, height } = global.window;
+const windowCanvas = Canvas.createCanvas(width, height);
+const windowContext = windowCanvas.getContext('2d');
 
 const makeMenuButton = (label, fn) => {
   const btn = new Button();
@@ -59,7 +62,7 @@ const makeCenter = (widget) => {
   v.addChild(new Container());
 
   return h;
-}
+};
 
 // Setup the root Container for the GUI
 const root = new Container(null, 'Root');
@@ -97,25 +100,25 @@ menu.addChild(makeMenuButton('Button', () => {
   lblAdd.text = '+1';
 
   btnAdd.onMouseClick = () => {
-    lblCount.text = (parseInt(lblCount.text) + 1);
-  }
+    lblCount.text = (parseInt(lblCount.text, 10) + 1);
+  };
 
-  new Widget(btns, 'Spacer');
+  const spacer = new Widget(null, 'Spacer');
+  btns.addChild(spacer);
 
   const btnSub = new Button(btns, 'Sub');
   const lblSub = new Label(btnSub);
   lblSub.text = '-1';
 
   btnSub.onMouseClick = () => {
-    lblCount.text = (parseInt(lblCount.text) - 1);
-  }
+    lblCount.text = (parseInt(lblCount.text, 10) - 1);
+  };
 
   display.addChild(makeCenter(tmp));
 }));
 
 menu.addChild(makeMenuButton('Container', () => {
   display.removeChildren();
-
 }));
 
 menu.addChild(makeMenuButton('Image', () => {
@@ -160,7 +163,7 @@ menu.addChild(makeMenuButton('Label', () => {
     btnFontA.onMouseClick = () => {
       lblA.font = Label.Fonts[font];
       lblB.font = Label.Fonts[font];
-    }
+    };
   });
   buttonBar.fixedHeight = rows * 45;
 
@@ -211,7 +214,7 @@ menu.addChild(makeMenuButton('Modal Dialog', () => {
   b.addChild(bl);
   b.onMouseClick = () => {
     display.removeChild(dialog);
-  }
+  };
 
   h.addChild(new Container());
   h.addChild(new Container());
@@ -224,18 +227,22 @@ menu.addChild(makeMenuButton('Modal Dialog', () => {
   tmp.addChild(lbl);
   tmp.onMouseClick = () => {
     display.addChild(dialog);
-  }
+  };
 
   display.addChild(makeCenter(tmp));
 }));
 
+const main = async () => {
+  while (!global.window.destroyed) {
+    windowContext.clearRect(0, 0, width, height);
+
+    root.draw(windowContext);
+    const buffer = windowCanvas.toBuffer('raw');
+    global.window.render(width, height, width * 4, 'bgra32', buffer);
+
+    await setTimeout(10);
+  }
+};
+
 // Run the window's loop
-while (!global.window.destroyed) {
-  windowContext.clearRect(0, 0, width, height);
-
-  root.draw(windowContext);
-	const buffer = windowCanvas.toBuffer('raw');
-	global.window.render(width, height, width * 4, 'bgra32', buffer);
-
-	await setTimeout(10);
-}
+main();

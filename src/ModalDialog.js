@@ -1,5 +1,3 @@
-"use strict"
-
 import crypto from 'crypto';
 import Widget from './Widget.js';
 import Container from './Container.js';
@@ -32,15 +30,11 @@ export default class ModalDialog extends Container {
 
     this.#modalBody.setPadding(25, 25, 25, 25);
 
-    this.#modalRoot.onMouseClick = () => {
-      return true;
-    }
-    this.onMouseClick = () => {
-      return true;
-    }
+    this.#modalRoot.onMouseClick = () => true;
+    this.onMouseClick = () => true;
 
     if (new.target === ModalDialog) {
-      Object.preventExtensions(this)
+      Object.preventExtensions(this);
     }
   }
 
@@ -48,20 +42,20 @@ export default class ModalDialog extends Container {
     return this.#modalBody.fixedHeight;
   }
 
-  get fixedWidth() {
-    return this.#modalCenter.fixedWidth;
-  }
-
-  get theme() {
-    return this.#modalRoot.theme;
-  }
-
   set fixedHeight(val) {
     this.#modalBody.fixedHeight = val;
   }
 
+  get fixedWidth() {
+    return this.#modalCenter.fixedWidth;
+  }
+
   set fixedWidth(val) {
     this.#modalCenter.fixedWidth = val;
+  }
+
+  get theme() {
+    return this.#modalRoot.theme;
   }
 
   set theme(val) {

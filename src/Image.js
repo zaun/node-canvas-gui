@@ -1,5 +1,3 @@
-"use strict"
-
 import crypto from 'crypto';
 import { loadImage } from 'canvas';
 import Widget from './Widget.js';
@@ -13,16 +11,16 @@ export default class Image extends Widget {
     super(parent, name);
 
     if (new.target === Widget) {
-      Object.preventExtensions(this)
+      Object.preventExtensions(this);
     }
-  }
-
-  get src() {
-    return this.#src;
   }
 
   get loading() {
     return this.#loading;
+  }
+
+  get src() {
+    return this.#src;
   }
 
   set src(val) {
@@ -34,12 +32,12 @@ export default class Image extends Widget {
     this.#loading = true;
     this.#image = null;
     loadImage(this.#src)
-    .then((image) => {
-      this.#image = image;
-    })
-    .finally(() => {
-      this.#loading = false;
-    });
+      .then((image) => {
+        this.#image = image;
+      })
+      .finally(() => {
+        this.#loading = false;
+      });
   }
 
   _draw(canvasCtx, depth = 0) {
@@ -49,8 +47,13 @@ export default class Image extends Widget {
     }
 
     if (!this.#loading) {
-      canvasCtx.drawImage(this.#image, this._container.x, this._container.y, this._container.w, this._container.h);
+      canvasCtx.drawImage(
+        this.#image,
+        this._container.x,
+        this._container.y,
+        this._container.w,
+        this._container.h,
+      );
     }
-
   }
 }

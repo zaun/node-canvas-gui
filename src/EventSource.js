@@ -1,5 +1,3 @@
-"use strict"
-
 export default class EventSource {
   _eventSource = null;
 
@@ -7,29 +5,21 @@ export default class EventSource {
     if (this._eventSource === null) {
       if (this._parent !== null) {
         return this._parent._eventSource;
-      } else {
-        return null;
       }
-    } else {
-      return this._eventSource;
+      return null;
     }
+    return this._eventSource;
   }
 
   set eventSource(val) {
     this._eventSource = val;
 
-    if (val.navigator) {
-      this.#setupBrowserEvents();
-    } else if (val.native) {
+    if (val.native) {
       this.#setupSDLEvents();
     } else {
       this._eventSource = null;
-      throw new Error("Unknown event source");
+      throw new Error('Unknown event source');
     }
-  }
-
-  #setupBrowserEvents() {
-    
   }
 
   #setupSDLEvents() {

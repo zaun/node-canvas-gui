@@ -1,5 +1,3 @@
-"use strict"
-
 import { createCanvas, Image } from 'canvas';
 import sp from 'synchronized-promise';
 
@@ -24,56 +22,56 @@ export default class Theme {
 
   static #parts = {
     Blue: [{
-      "key": "PANEL",
-      "x": 190,
-      "y": 94,
-      "width": 100,
-      "height": 100
+      key: 'PANEL',
+      x: 190,
+      y: 94,
+      width: 100,
+      height: 100,
     }, {
-      "key": "DOWN_ARROW",
-      "x": 416,
-      "y": 72,
-      "width": 28,
-      "height": 42
+      key: 'DOWN_ARROW',
+      x: 416,
+      y: 72,
+      width: 28,
+      height: 42,
     }, {
-      "key": "UP_ARROW",
-      "x": 388,
-      "y": 72,
-      "width": 28,
-      "height": 42
+      key: 'UP_ARROW',
+      x: 388,
+      y: 72,
+      width: 28,
+      height: 42,
     }, {
-      "key": "BUTTON",
-      "x": 0,
-      "y": 0,
-      "width": 190,
-      "height": 49
+      key: 'BUTTON',
+      x: 0,
+      y: 0,
+      width: 190,
+      height: 49,
     }, {
-      "key": "BUTTON_HOVER",
-      "x": 190,
-      "y": 0,
-      "width": 190,
-      "height": 49
+      key: 'BUTTON_HOVER',
+      x: 190,
+      y: 0,
+      width: 190,
+      height: 49,
     }],
     Grey: [{
-      "key": "PANEL",
-      "x": 190,
-      "y": 98,
-      "width": 100,
-      "height": 100
+      key: 'PANEL',
+      x: 190,
+      y: 98,
+      width: 100,
+      height: 100,
     }, {
-      "key": "BUTTON",
-      "x": 0,
-      "y": 143,
-      "width": 190,
-      "height": 49
+      key: 'BUTTON',
+      x: 0,
+      y: 143,
+      width: 190,
+      height: 49,
     }, {
-      "key": "BUTTON_HOVER",
-      "x": 0,
-      "y": 0,
-      "width": 188,
-      "height": 49
-    }]
-  }
+      key: 'BUTTON_HOVER',
+      x: 0,
+      y: 0,
+      width: 188,
+      height: 49,
+    }],
+  };
 
   static get Colors() {
     return this.#Colors;
@@ -108,7 +106,7 @@ export default class Theme {
       };
       this.#assets.image.onerror = (err) => {
         delete this.#assets.image;
-        reject();
+        reject(err);
       };
       this.#assets.image.src = Theme.#images[this.#color];
     });
@@ -124,14 +122,24 @@ export default class Theme {
       const ctx = this.#assets[entry.key].getContext('2d');
       ctx.drawImage(
         this.#assets.image,
-        entry.x, entry.y, entry.width, entry.height,
-        0, 0, entry.width, entry.height,
+        entry.x,
+        entry.y,
+        entry.width,
+        entry.height,
+        0,
+        0,
+        entry.width,
+        entry.height,
       );
     });
   }
 
   draw9slice = (canvasCtx, partName, x, y, width, height) => {
-    const image = this.#assets.image && this.#assets[partName] ? this.#assets[partName] : this.#assets.EMPTY;
+    let image = this.#assets.EMPTY;
+    if (this.#assets.image && this.#assets[partName]) {
+      image = this.#assets[partName];
+    }
+
     const imageWidth = Math.ceil(image.width / 3);
     const imageHeight = Math.ceil(image.height / 3);
 
@@ -149,14 +157,87 @@ export default class Theme {
     if (centerPartsWidth < 0) {
       centerPartsWidth = 0;
     }
-    canvasCtx.drawImage(image, ...part1, x + 0, y + 0, imageWidth, imageHeight); // top left
-    canvasCtx.drawImage(image, ...part3, x + width - imageWidth, y + 0, imageWidth, imageHeight); // top right
-    canvasCtx.drawImage(image, ...part7, x + 0, y + height - imageHeight, imageWidth, imageHeight); // bottom left
-    canvasCtx.drawImage(image, ...part9, x + width - imageWidth, y + height - imageHeight, imageWidth, imageHeight); // bottom right
-    canvasCtx.drawImage(image, ...part2, x + imageWidth, y + 0, centerPartsWidth, imageHeight); // top
-    canvasCtx.drawImage(image, ...part8, x + imageWidth, y + height - imageHeight, centerPartsWidth, imageHeight); // bottom
-    canvasCtx.drawImage(image, ...part4, x + 0, y + imageHeight, imageWidth, height - 2 * imageHeight); // left
-    canvasCtx.drawImage(image, ...part6, x + width - imageWidth, y + imageHeight, imageWidth, height - 2 * imageHeight); // right
-    canvasCtx.drawImage(image, ...part5, x + imageWidth, y + imageHeight, centerPartsWidth, height - 2 * imageHeight); // center
-  }
+
+    // top left
+    canvasCtx.drawImage(
+      image,
+      ...part1,
+      x + 0,
+      y + 0,
+      imageWidth,
+      imageHeight,
+    );
+    // top right
+    canvasCtx.drawImage(
+      image,
+      ...part3,
+      x + width - imageWidth,
+      y + 0,
+      imageWidth,
+      imageHeight,
+    );
+    // bottom left
+    canvasCtx.drawImage(
+      image,
+      ...part7,
+      x + 0,
+      y + height - imageHeight,
+      imageWidth,
+      imageHeight,
+    );
+    // bottom right
+    canvasCtx.drawImage(
+      image,
+      ...part9,
+      x + width - imageWidth,
+      y + height - imageHeight,
+      imageWidth,
+      imageHeight,
+    );
+    // top
+    canvasCtx.drawImage(
+      image,
+      ...part2,
+      x + imageWidth,
+      y + 0,
+      centerPartsWidth,
+      imageHeight,
+    );
+    // bottom
+    canvasCtx.drawImage(
+      image,
+      ...part8,
+      x + imageWidth,
+      y + height - imageHeight,
+      centerPartsWidth,
+      imageHeight,
+    );
+    // left
+    canvasCtx.drawImage(
+      image,
+      ...part4,
+      x + 0,
+      y + imageHeight,
+      imageWidth,
+      height - 2 * imageHeight,
+    );
+    // right
+    canvasCtx.drawImage(
+      image,
+      ...part6,
+      x + width - imageWidth,
+      y + imageHeight,
+      imageWidth,
+      height - 2 * imageHeight,
+    );
+    // center
+    canvasCtx.drawImage(
+      image,
+      ...part5,
+      x + imageWidth,
+      y + imageHeight,
+      centerPartsWidth,
+      height - 2 * imageHeight,
+    );
+  };
 }

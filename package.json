@@ -14,13 +14,17 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "example": "node example/index.js"
+    "example": "node example/index.js",
+    "lint": "eslint ./src/ ./example/"
   },
   "dependencies": {
     "synchronized-promise": "^0.3.1"
   },
   "devDependencies": {
     "@kmamal/sdl": "^0.4.x",
+    "eslint": "^8.25.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "node": "lts"
   },
   "peerDependencies": {
