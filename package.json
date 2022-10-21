@@ -17,6 +17,9 @@
     "example": "node example/index.js",
     "lint": "eslint ./src/ ./example/"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "dependencies": {
     "synchronized-promise": "^0.3.1"
   },
@@ -25,7 +28,8 @@
     "eslint": "^8.25.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "node": "lts"
+    "node": "lts",
+    "pre-commit": "^1.2.2"
   },
   "peerDependencies": {
     "canvas": "^2.10.1"
