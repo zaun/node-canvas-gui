@@ -58,5 +58,9 @@ export default class EventSource {
         });
       }
     });
+
+    this._eventSource.on('keyDown', (event) => {
+      this._eventKeyDown(event);
+    });
   }
 }

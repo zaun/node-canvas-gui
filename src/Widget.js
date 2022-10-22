@@ -249,13 +249,14 @@ export default class Widget extends EventSource {
       && this._mousePosY > this._container.y
       && this._mousePosY < this._container.y + this._container.h
     ) {
-      this._mouseDown = true;
       this._mouseClick = true;
-    } else {
-      this._mouseDown = false;
     }
+    this._mouseDown = false;
     return false;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  _eventKeyDown() { }
 
   setContainer(x, y, w, h) {
     if (

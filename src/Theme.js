@@ -4,8 +4,11 @@ import sp from 'synchronized-promise';
 export default class Theme {
   static #Parts = {
     Panel: 'PANEL',
-    Button: 'BUTTON',
-    ButtonHover: 'BUTTON_HOVER',
+    Button: 'BUTTON_A',
+    ButtonHover: 'BUTTON_A_HOVER',
+    ButtonPressed: 'BUTTON_A_PRESSED',
+    InputBackground: 'INPUT_BACKGROUND',
+    Test: 'TEST',
   };
 
   static #Colors = {
@@ -28,6 +31,36 @@ export default class Theme {
       width: 100,
       height: 100,
     }, {
+      key: 'BUTTON_B',
+      x: 190,
+      y: 194,
+      width: 49,
+      height: 45,
+    }, {
+      key: 'BUTTON_A',
+      x: 337,
+      y: 184,
+      width: 49,
+      height: 49,
+    }, {
+      key: 'BUTTON_A_HOVER',
+      x: 239,
+      y: 194,
+      width: 49,
+      height: 49,
+    }, {
+      key: 'BUTTON_A_PRESSED',
+      x: 339,
+      y: 94,
+      width: 49,
+      height: 49,
+    }, {
+      key: 'INPUT_BACKGROUND',
+      x: 288,
+      y: 194,
+      width: 49,
+      height: 49,
+    }, {
       key: 'DOWN_ARROW',
       x: 416,
       y: 72,
@@ -39,19 +72,8 @@ export default class Theme {
       y: 72,
       width: 28,
       height: 42,
-    }, {
-      key: 'BUTTON',
-      x: 0,
-      y: 0,
-      width: 190,
-      height: 49,
-    }, {
-      key: 'BUTTON_HOVER',
-      x: 190,
-      y: 0,
-      width: 190,
-      height: 49,
     }],
+
     Grey: [{
       key: 'PANEL',
       x: 190,

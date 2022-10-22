@@ -151,6 +151,19 @@ export default class Container extends Widget {
     return done;
   }
 
+  _eventKeyDown(event) {
+    let done = false;
+    this.#children.forEach((w) => {
+      if (!done) {
+        done = w._eventKeyDown(event);
+      }
+    });
+    if (!done) {
+      done = super._eventKeyDown(event);
+    }
+    return done;
+  }
+
   _preDraw(canvasCtx, depth) {
     super._preDraw(canvasCtx, depth);
     this.#children.forEach((w) => {

@@ -10,6 +10,7 @@ import Panel from './Panel.js';
 import Label from './Label.js';
 import Button from './Button.js';
 import Image from './Image.js';
+import Input from './Input.js';
 
 const filename = fileURLToPath(import.meta.url);
 const importPath = dirname(filename);
@@ -45,5 +46,6 @@ export {
   Label,
   Button,
   Image,
+  Input,
   makeLabelButton,
 };

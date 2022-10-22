@@ -13,6 +13,7 @@ import {
   Label,
   Button,
   Image,
+  Input,
   makeLabelButton,
 } from '../src/index.js';
 
@@ -185,6 +186,14 @@ menu.addChild(makeMenuButton('Panel', () => {
   display.removeChildren();
 
   const tmp = new Panel();
+
+  display.addChild(makeCenter(tmp));
+}));
+
+menu.addChild(makeMenuButton('Input', () => {
+  display.removeChildren();
+
+  const tmp = new Input();
 
   display.addChild(makeCenter(tmp));
 }));

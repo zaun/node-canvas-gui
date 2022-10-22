@@ -19,8 +19,11 @@ export default class Button extends Container {
     }
 
     let part = Theme.Parts.Button;
-    if (this._mouseHover) {
+    if (this._mouseHover && !this._mouseDown) {
       part = Theme.Parts.ButtonHover;
+    }
+    if (this._mouseHover && this._mouseDown) {
+      part = Theme.Parts.ButtonPressed;
     }
 
     this.theme.draw9slice(
