@@ -10,7 +10,7 @@ export default class Image extends Widget {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    if (new.target === Widget) {
+    if (new.target === Image) {
       Object.preventExtensions(this);
     }
   }
@@ -42,7 +42,7 @@ export default class Image extends Widget {
 
   _draw(canvasCtx, depth = 0) {
     super._draw(canvasCtx, depth);
-    if (this.constructor.name === 'Widget') {
+    if (this.constructor.name === 'Image') {
       this._logme(depth);
     }
 
