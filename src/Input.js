@@ -10,6 +10,7 @@ export default class Input extends Widget {
     Input.#blinker = setInterval(() => {
       Input.#blink = !Input.#blink;
     }, 500);
+    Input.#blinker.unref();
   }
 
   #value = '';

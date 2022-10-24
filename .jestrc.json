@@ -1,7 +1,15 @@
 {
   "testEnvironment": "node",
   "verbose": true,
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/**/*"
+  ],
   "reporters":[
     "default"
+  ],
+  "coverageReporters": [
+    "html",
+    "text"
   ]
 }

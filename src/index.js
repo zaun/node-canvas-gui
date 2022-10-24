@@ -29,7 +29,7 @@ registerFont(`${fontPath}/Kenney Pixel.ttf`, { family: 'Kenney_Pixel' });
 registerFont(`${fontPath}/Kenney Rocket Square.ttf`, { family: 'Kenney_Rocket_Square' });
 registerFont(`${fontPath}/Kenney Rocket.ttf`, { family: 'Kenney_Rocket' });
 
-const makeLabelButton = (parent = null, name = '', text = '') => {
+const makeLabelButton = (text = '', parent = null, name = '') => {
   const button = new Button(parent, name);
   const label = new Label(button);
   label.text = text;

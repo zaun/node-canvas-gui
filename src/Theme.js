@@ -139,6 +139,10 @@ export default class Theme {
     // The image is a data URI so it will be fast
     sp(this.#createImage());
 
+    if (this.color === Theme.Colors.Inherit) {
+      return;
+    }
+
     Theme.#parts[this.#color].forEach((entry) => {
       this.#assets[entry.key] = createCanvas(entry.width, entry.height);
       const ctx = this.#assets[entry.key].getContext('2d');

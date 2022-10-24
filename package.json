@@ -16,7 +16,8 @@
   "scripts": {
     "example": "node example/index.js",
     "lint": "eslint ./src/ ./example/",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config .jestrc.json"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config .jestrc.json",
+    "coverage": "npm test ; open ./coverage/index.html"
   },
   "pre-commit": [
     "lint",
