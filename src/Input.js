@@ -52,6 +52,7 @@ export default class Input extends Widget {
       return;
     }
     if (key.length > 1) {
+      // eslint-disable-next-line no-console
       console.log(key);
       key = '';
     }
@@ -70,10 +71,10 @@ export default class Input extends Widget {
     this.theme.draw9slice(
       canvasCtx,
       Theme.Parts.InputBackground,
-      this._container.x,
-      this._container.y,
-      this._container.w,
-      this._container.h,
+      this.container.x,
+      this.container.y,
+      this.container.w,
+      this.container.h,
     );
 
     canvasCtx.save();

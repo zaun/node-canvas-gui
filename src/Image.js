@@ -49,10 +49,10 @@ export default class Image extends Widget {
     if (!this.#loading) {
       canvasCtx.drawImage(
         this.#image,
-        this._container.x,
-        this._container.y,
-        this._container.w,
-        this._container.h,
+        this.container.x,
+        this.container.y,
+        this.container.w,
+        this.container.h,
       );
     }
   }

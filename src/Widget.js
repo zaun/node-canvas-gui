@@ -28,6 +28,13 @@ export default class Widget extends EventSource {
     r: 0,
   };
 
+  #container = {
+    x: 0,
+    y: 0,
+    w: 0,
+    h: 0,
+  };
+
   // extended classes need access to these.
   _absolutePosition = false;
   _parent = null;
@@ -38,13 +45,6 @@ export default class Widget extends EventSource {
   _mouseDown = false;
   _mouseClick = false;
   _onMouseClick = null;
-
-  _container = {
-    x: 0,
-    y: 0,
-    w: 0,
-    h: 0,
-  };
 
   _tint = {
     r: 0,
@@ -78,18 +78,23 @@ export default class Widget extends EventSource {
   }
 
   get body() {
-    const w = this.#fixedWidth === 0 ? this._container.w : this.fixedWidth;
-    const h = this.#fixedHeight === 0 ? this._container.h : this.fixedHeight;
     return {
-      x: this._container.x + this.#padding.l,
-      y: this._container.y + this.#padding.t,
-      w: w - this.#padding.l - this.#padding.r,
-      h: h - this.#padding.t - this.#padding.b,
+      x: this.container.x + this.#padding.l,
+      y: this.container.y + this.#padding.t,
+      w: this.container.w - this.#padding.l - this.#padding.r,
+      h: this.container.h - this.#padding.t - this.#padding.b,
     };
   }
 
   get container() {
-    return this._container;
+    const w = this.#fixedWidth === 0 ? this.#container.w : this.fixedWidth;
+    const h = this.#fixedHeight === 0 ? this.#container.h : this.fixedHeight;
+    return {
+      x: this.#container.x,
+      y: this.#container.y,
+      w,
+      h,
+    };
   }
 
   get padding() {
@@ -217,10 +222,10 @@ export default class Widget extends EventSource {
     this._mousePosX = event.x;
     this._mousePosY = event.y;
     if (
-      this._mousePosX > this._container.x
-      && this._mousePosX < this._container.x + this._container.w
-      && this._mousePosY > this._container.y
-      && this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this.#container.x
+      && this._mousePosX < this.#container.x + this.#container.w
+      && this._mousePosY > this.#container.y
+      && this._mousePosY < this.#container.y + this.#container.h
     ) {
       this._mouseHover = true;
     } else {
@@ -230,10 +235,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonDown() {
     if (
-      this._mousePosX > this._container.x
-      && this._mousePosX < this._container.x + this._container.w
-      && this._mousePosY > this._container.y
-      && this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this.#container.x
+      && this._mousePosX < this.#container.x + this.#container.w
+      && this._mousePosY > this.#container.y
+      && this._mousePosY < this.#container.y + this.#container.h
     ) {
       this._mouseDown = true;
     } else {
@@ -244,10 +249,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonUp() {
     if (
-      this._mousePosX > this._container.x
-      && this._mousePosX < this._container.x + this._container.w
-      && this._mousePosY > this._container.y
-      && this._mousePosY < this._container.y + this._container.h
+      this._mousePosX > this.#container.x
+      && this._mousePosX < this.#container.x + this.#container.w
+      && this._mousePosY > this.#container.y
+      && this._mousePosY < this.#container.y + this.#container.h
     ) {
       this._mouseClick = true;
     }
@@ -260,15 +265,15 @@ export default class Widget extends EventSource {
 
   setContainer(x, y, w, h) {
     if (
-      this._container.x !== x
-      || this._container.y !== y
-      || this._container.w !== w
-      || this._container.h !== h
+      this.#container.x !== x
+      || this.#container.y !== y
+      || this.#container.w !== w
+      || this.#container.h !== h
     ) {
-      this._container.x = x;
-      this._container.y = y;
-      this._container.w = w;
-      this._container.h = h;
+      this.#container.x = x;
+      this.#container.y = y;
+      this.#container.w = w;
+      this.#container.h = h;
       this._performLayout();
     }
   }
@@ -314,10 +319,10 @@ export default class Widget extends EventSource {
       canvasCtx.save();
       canvasCtx.fillStyle = this.#backgroundColor;
       canvasCtx.fillRect(
-        this._container.x,
-        this._container.y,
-        this._container.w,
-        this._container.h,
+        this.#container.x,
+        this.#container.y,
+        this.#container.w,
+        this.#container.h,
       );
       canvasCtx.restore();
     }
@@ -334,7 +339,7 @@ export default class Widget extends EventSource {
     // canvasCtx.save();
     // canvasCtx.beginPath();
     // canvasCtx.strokeStyle = this.#borderColor;
-    // canvasCtx.rect(this._container.x, this._container.y, this._container.w, this._container.h);
+    // canvasCtx.rect(this.#container.x, this.#container.y, this.#container.w, this.#container.h);
     // canvasCtx.stroke();
     // canvasCtx.restore();
   }

@@ -5,6 +5,12 @@
   },
   "extends": "airbnb-base",
   "overrides": [
+    {
+      "files": ["tests/**/*"],
+      "plugins": ["jest"],
+      "extends": ["plugin:jest/recommended"],
+      "rules": { "jest/prefer-expect-assertions": "off" }
+    }
   ],
   "parserOptions": {
     "ecmaVersion": "latest",

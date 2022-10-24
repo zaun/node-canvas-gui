@@ -69,7 +69,7 @@ export default class Label extends Widget {
     }
 
     canvasCtx.save();
-    canvasCtx.rect(this._container.x, this._container.y, this._container.w, this._container.h);
+    canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
     canvasCtx.clip();
 
     canvasCtx.font = `${this.#size}px ${this.#font}`;
@@ -89,15 +89,15 @@ export default class Label extends Widget {
     const height = lines.length * lineHight;
 
     for (let i = 0; i < lines.length; i += 1) {
-      let x = this._container.x + (this._container.w / 2) - (maxWidth / 2);
-      if (x < this._container.x) {
-        x = this._container.x;
+      let x = this.container.x + (this.container.w / 2) - (maxWidth / 2);
+      if (x < this.container.x) {
+        x = this.container.x;
       }
 
-      let y = this._container.y + (this._container.h / 2);
+      let y = this.container.y + (this.container.h / 2);
       y = y - (height / 2) + (i * lineHight) + (lineHight / 2);
-      if (y < this._container.y) {
-        y = this._container.y;
+      if (y < this.container.y) {
+        y = this.container.y;
       }
 
       canvasCtx.fillText(lines[i], x, y);
