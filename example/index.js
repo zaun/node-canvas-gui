@@ -160,7 +160,7 @@ menu.addChild(makeMenuButton('Label', () => {
       row.fixedHeight = 45;
       rows += 1;
     }
-    const btnFontA = makeLabelButton(row, '', font);
+    const btnFontA = makeLabelButton(font, row);
     btnFontA.onMouseClick = () => {
       lblA.font = Label.Fonts[font];
       lblB.font = Label.Fonts[font];
