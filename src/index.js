@@ -33,7 +33,7 @@ const makeLabelButton = (text = '', parent = null, name = '') => {
   const button = new Button(parent, name);
   const label = new Label(button);
   label.text = text;
-
+  label.foreground = label.theme.colors.actionForeground;
   return button;
 };
 

@@ -26,6 +26,7 @@ export default class Label extends Widget {
   #text = '';
   #font = 'sans';
   #size = 0;
+  #foreground = '';
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
@@ -61,6 +62,14 @@ export default class Label extends Widget {
     this.#size = val;
   }
 
+  get foreground() {
+    return this.#foreground;
+  }
+
+  set foreground(val) {
+    this.#foreground = val;
+  }
+
   _draw(canvasCtx, depth = 0) {
     super._draw(canvasCtx, depth);
 
@@ -73,6 +82,7 @@ export default class Label extends Widget {
     canvasCtx.clip();
 
     canvasCtx.font = `${this.#size}px ${this.#font}`;
+    canvasCtx.fillStyle = this.#foreground === '' ? this.theme.colors.foreground : this.#foreground;
     const lines = this.#text.split('\n');
 
     let maxWidth = 0;

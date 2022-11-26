@@ -53,13 +53,13 @@ export default class Widget extends EventSource {
     a: 0,
   };
 
-  constructor(parent = null, name = crypto.randomUUID(), themeColor = Theme.Colors.Inherit) {
+  constructor(parent = null, name = crypto.randomUUID(), themeColor = Theme.Themes.Inherit) {
     super();
 
     this.#name = name;
 
     if (themeColor) {
-      if (themeColor === Theme.Colors.Inherit) {
+      if (themeColor === Theme.Themes.Inherit) {
         this._theme = null;
       } else {
         this._theme = new Theme(themeColor);
@@ -192,14 +192,14 @@ export default class Widget extends EventSource {
       if (this._parent !== null) {
         return this._parent.theme;
       }
-      return new Theme(Theme.Colors.Blue);
+      return Theme.default;
     }
     return this._theme;
   }
 
   set theme(val) {
     if (val) {
-      if (val === Theme.Colors.Inherit) {
+      if (val === Theme.Themes.Inherit) {
         this._theme = null;
       } else {
         this._theme = new Theme(val);

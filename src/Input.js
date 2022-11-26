@@ -18,13 +18,15 @@ export default class Input extends Widget {
   #offset = 0;
 
   #font = 'sans';
-  #size = 16;
+  #size = -1; // Default to auto-font size
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
     this.fixedHeight = 49;
-    this.setPadding(10, 15, 10, 10);
+    const info = this.theme.getPartInfo(Theme.Parts.InputBackground);
+    const i = info.bgIndent * 2;
+    this.setPadding(i, i, i, i);
 
     if (new.target === Input) {
       Object.preventExtensions(this);
@@ -37,6 +39,22 @@ export default class Input extends Widget {
 
   set value(val) {
     this.#value = val.toString();
+  }
+
+  get font() {
+    return this.#font;
+  }
+
+  set font(val) {
+    this.#font = val;
+  }
+
+  get fontSize() {
+    return this.#size;
+  }
+
+  set fontSize(val) {
+    this.#size = val;
   }
 
   _eventKeyDown(event) {
@@ -54,7 +72,7 @@ export default class Input extends Widget {
     }
     if (key.length > 1) {
       // eslint-disable-next-line no-console
-      console.log(key);
+      // console.log(key);
       key = '';
     }
     if (event.shift || event.capslock) {
@@ -69,6 +87,11 @@ export default class Input extends Widget {
       this._logme(depth);
     }
 
+    let background = this.theme.colors.action;
+    if (this._mouseHover) {
+      background = this.theme.colors.actionHighlight;
+    }
+
     this.theme.draw9slice(
       canvasCtx,
       Theme.Parts.InputBackground,
@@ -76,16 +99,29 @@ export default class Input extends Widget {
       this.container.y,
       this.container.w,
       this.container.h,
+      background,
     );
 
     canvasCtx.save();
     canvasCtx.rect(this.body.x, this.body.y, this.body.w, this.body.h);
     canvasCtx.clip();
 
-    canvasCtx.fillStyle = this.#value === '' ? '#666666' : '#000000';
-    canvasCtx.font = `${this.#size}px ${this.#font}`;
+    // Set the font color
+    canvasCtx.fillStyle = this.theme.colors.actionForeground;
+    if (this.#value === '') {
+      canvasCtx.fillStyle = this.theme.colors.actionLightForeground;
+    }
 
-    const chInfo = canvasCtx.measureText('$');
+    // Calculate max font size if set font size is -1
+    let fontSize = this.#size;
+    let chInfo = null;
+    do {
+      canvasCtx.font = `${fontSize}px ${this.#font}`;
+      chInfo = canvasCtx.measureText('$');
+      fontSize += 0.5;
+    } while (this.#size === -1 && (chInfo.emHeightAscent + chInfo.emHeightDescent) < this.body.h);
+
+    // Scroll text if it wont all fit
     const lineWidth = canvasCtx.measureText(this.#value).width;
     this.#offset = lineWidth > this.body.w - 5 ? lineWidth - (this.body.w - 5) : 0;
 

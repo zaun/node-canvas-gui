@@ -23,6 +23,7 @@ export default class Panel extends Container {
       this.container.y,
       this.container.w,
       this.container.h,
+      this.theme.colors.background,
     );
 
     super._draw(canvasCtx, depth);

@@ -11,7 +11,7 @@ import {
   Theme,
   Panel,
   Label,
-  Button,
+  // Button,
   Image,
   Input,
   makeLabelButton,
@@ -35,12 +35,8 @@ const windowCanvas = Canvas.createCanvas(width, height);
 const windowContext = windowCanvas.getContext('2d');
 
 const makeMenuButton = (label, fn) => {
-  const btn = new Button();
+  const btn = makeLabelButton(label);
   btn.fixedHeight = 50;
-
-  const lbl = new Label();
-  lbl.text = label;
-  btn.addChild(lbl);
 
   if (fn) {
     btn.onMouseClick = fn;
@@ -70,18 +66,18 @@ const root = new Container(null, 'Root');
 root.orientation = Container.Orientation.Horizontal;
 root.eventSource = global.window;
 root.setContainer(0, 0, global.window.width, global.window.height);
+root.theme = Theme.Themes.Eagle;
 
 // Add a Container for menu
 const menu = new Container(root, 'Menu');
 menu.orientation = Container.Orientation.Vertical;
 menu.fixedWidth = global.window.width / 5;
+menu.setPadding(0, 0, 0, 10);
 
 // Add a panel for display
 const background = new Panel(root, 'Display Background');
-background.theme = Theme.Colors.Gray;
 background.setPadding(10, 10, 10, 10);
 const display = new Container(background, 'Display');
-display.theme = Theme.Colors.Blue;
 
 // Add widget examples
 menu.addChild(makeMenuButton('Button', () => {
@@ -96,10 +92,7 @@ menu.addChild(makeMenuButton('Button', () => {
   const btns = new Container(tmp, 'Button Bar');
   btns.fixedHeight = 50;
 
-  const btnAdd = new Button(btns, 'Add');
-  const lblAdd = new Label(btnAdd);
-  lblAdd.text = '+1';
-
+  const btnAdd = makeLabelButton('+1', btns);
   btnAdd.onMouseClick = () => {
     lblCount.text = (parseInt(lblCount.text, 10) + 1);
   };
@@ -107,10 +100,7 @@ menu.addChild(makeMenuButton('Button', () => {
   const spacer = new Widget(null, 'Spacer');
   btns.addChild(spacer);
 
-  const btnSub = new Button(btns, 'Sub');
-  const lblSub = new Label(btnSub);
-  lblSub.text = '-1';
-
+  const btnSub = makeLabelButton('-1', btns);
   btnSub.onMouseClick = () => {
     lblCount.text = (parseInt(lblCount.text, 10) - 1);
   };
@@ -202,9 +192,7 @@ menu.addChild(makeMenuButton('Modal Dialog', () => {
   display.removeChildren();
 
   const dialog = new ModalDialog(null, 'test');
-  dialog.theme = Theme.Colors.Grey;
   const c = new Container();
-  c.theme = Theme.Colors.Blue;
   c.orientation = Container.Orientation.Vertical;
   dialog.addChild(c);
 
@@ -217,10 +205,7 @@ menu.addChild(makeMenuButton('Modal Dialog', () => {
   const h = new Container();
   c.addChild(h);
 
-  const b = new Button();
-  const bl = new Label();
-  bl.text = 'Close';
-  b.addChild(bl);
+  const b = makeLabelButton('Close');
   b.onMouseClick = () => {
     display.removeChild(dialog);
   };
@@ -229,11 +214,8 @@ menu.addChild(makeMenuButton('Modal Dialog', () => {
   h.addChild(new Container());
   h.addChild(b);
 
-  const tmp = new Button();
+  const tmp = makeLabelButton('Open ModalDialog');
   tmp.fixedHeight = 50;
-  const lbl = new Label();
-  lbl.text = 'Open ModalDialog';
-  tmp.addChild(lbl);
   tmp.onMouseClick = () => {
     display.addChild(dialog);
   };
