@@ -25,13 +25,13 @@ export default class Label extends Widget {
 
   #text = '';
   #font = 'sans';
-  #size = 0;
+  #size = -1; // Default to auto-font size
   #foreground = '';
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this.fontSize = 16;
+    this.setPadding(3, 3, 3, 3);
 
     if (new.target === Label) {
       Object.preventExtensions(this);
@@ -78,12 +78,23 @@ export default class Label extends Widget {
     }
 
     canvasCtx.save();
-    canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
+    canvasCtx.rect(this.body.x, this.body.y, this.body.w, this.body.h);
     canvasCtx.clip();
 
-    canvasCtx.font = `${this.#size}px ${this.#font}`;
-    canvasCtx.fillStyle = this.#foreground === '' ? this.theme.colors.foreground : this.#foreground;
     const lines = this.#text.split('\n');
+
+    // Calculate max font size if set font size is -1
+    let fontSize = this.#size === -1 ? 0.5 : this.#size;
+    let chInfo = null;
+    let lineHeight = 0;
+    do {
+      fontSize += 0.5;
+      canvasCtx.font = `${fontSize}px ${this.#font}`;
+      chInfo = canvasCtx.measureText('$');
+      lineHeight = chInfo.emHeightAscent + chInfo.emHeightDescent + 2;
+    } while (this.#size === -1 && (lineHeight * lines.length) < this.body.h);
+
+    canvasCtx.fillStyle = this.#foreground === '' ? this.theme.colors.foreground : this.#foreground;
 
     let maxWidth = 0;
     for (let i = 0; i < lines.length; i += 1) {
@@ -93,21 +104,18 @@ export default class Label extends Widget {
       }
     }
 
-    const chInfo = canvasCtx.measureText('$');
-    const lineHight = chInfo.emHeightAscent + chInfo.emHeightDescent + 2;
-
-    const height = lines.length * lineHight;
-
     for (let i = 0; i < lines.length; i += 1) {
-      let x = this.container.x + (this.container.w / 2) - (maxWidth / 2);
-      if (x < this.container.x) {
-        x = this.container.x;
+      let x = this.body.x + (this.body.w / 2) - (maxWidth / 2);
+      if (x < this.body.x) {
+        x = this.body.x;
       }
 
-      let y = this.container.y + (this.container.h / 2);
-      y = y - (height / 2) + (i * lineHight) + (lineHight / 2);
-      if (y < this.container.y) {
-        y = this.container.y;
+      let y = this.body.y + (this.body.h / 2);
+      y += (chInfo.emHeightAscent / 2);
+      y -= (chInfo.emHeightDescent / 2);
+      y += (i * lineHeight);
+      if (y < this.body.y) {
+        y = this.body.y;
       }
 
       canvasCtx.fillText(lines[i], x, y);

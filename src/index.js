@@ -8,6 +8,7 @@ import ModalDialog from './ModalDialog.js';
 import Theme from './Theme.js';
 import Panel from './Panel.js';
 import Label from './Label.js';
+import List from './List.js';
 import Button from './Button.js';
 import Image from './Image.js';
 import Input from './Input.js';
@@ -44,6 +45,7 @@ export {
   Theme,
   Panel,
   Label,
+  List,
   Button,
   Image,
   Input,

@@ -164,6 +164,19 @@ export default class Container extends Widget {
     return done;
   }
 
+  _eventMouseWheel(event) {
+    let done = false;
+    this.#children.forEach((w) => {
+      if (!done) {
+        done = w._eventMouseWheel(event);
+      }
+    });
+    if (!done) {
+      done = super._eventMouseWheel(event);
+    }
+    return done;
+  }
+
   _preDraw(canvasCtx, depth) {
     super._preDraw(canvasCtx, depth);
     this.#children.forEach((w) => {

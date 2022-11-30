@@ -25,8 +25,8 @@ export default class Input extends Widget {
 
     this.fixedHeight = 49;
     const info = this.theme.getPartInfo(Theme.Parts.InputBackground);
-    const i = info.bgIndent * 2;
-    this.setPadding(i, i, i, i);
+    this._indent = info.bgIndent + 2;
+    this.setPadding(3, 3, 3, 3);
 
     if (new.target === Input) {
       Object.preventExtensions(this);
@@ -113,13 +113,15 @@ export default class Input extends Widget {
     }
 
     // Calculate max font size if set font size is -1
-    let fontSize = this.#size;
+    let fontSize = this.#size === -1 ? 0.5 : this.#size;
     let chInfo = null;
+    let lineHeight = 0;
     do {
+      fontSize += 0.5;
       canvasCtx.font = `${fontSize}px ${this.#font}`;
       chInfo = canvasCtx.measureText('$');
-      fontSize += 0.5;
-    } while (this.#size === -1 && (chInfo.emHeightAscent + chInfo.emHeightDescent) < this.body.h);
+      lineHeight = chInfo.emHeightAscent + chInfo.emHeightDescent + 2;
+    } while (this.#size === -1 && lineHeight < this.body.h);
 
     // Scroll text if it wont all fit
     const lineWidth = canvasCtx.measureText(this.#value).width;

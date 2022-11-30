@@ -16,6 +16,13 @@ export default class Panel extends Container {
       this._logme(depth);
     }
 
+    // Theme changed
+    const info = this.theme.getPartInfo(Theme.Parts.Panel);
+    if (this._indent !== info.bgIndent) {
+      this._indent = info.bgIndent + 2;
+      this._performLayout();
+    }
+
     this.theme.draw9slice(
       canvasCtx,
       Theme.Parts.Panel,

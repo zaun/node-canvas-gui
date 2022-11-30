@@ -4,7 +4,7 @@ export default class EventSource {
   get eventSource() {
     if (this._eventSource === null) {
       if (this._parent !== null) {
-        return this._parent._eventSource;
+        return this._parent.eventSource;
       }
       return null;
     }
@@ -53,6 +53,8 @@ export default class EventSource {
       }
       if (typeof this._eventMouseWheel === 'function') {
         this._eventMouseWheel({
+          x: event.x,
+          y: event.y,
           dx: event.flipped === true ? event.dx * -1 : event.dx,
           dy: event.flipped === true ? event.dy * -1 : event.dy,
         });

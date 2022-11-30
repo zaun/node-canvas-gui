@@ -36,6 +36,7 @@ export default class Widget extends EventSource {
   };
 
   // extended classes need access to these.
+  _indent = 0; // indent for body that is not use controlled. Set by widget based on theme
   _absolutePosition = false;
   _parent = null;
   _theme = null;
@@ -79,10 +80,10 @@ export default class Widget extends EventSource {
 
   get body() {
     return {
-      x: this.container.x + this.#padding.l,
-      y: this.container.y + this.#padding.t,
-      w: this.container.w - this.#padding.l - this.#padding.r,
-      h: this.container.h - this.#padding.t - this.#padding.b,
+      x: this.container.x + this.#padding.l + this._indent,
+      y: this.container.y + this.#padding.t + this._indent,
+      w: this.container.w - this.#padding.l - this.#padding.r - this._indent - this._indent,
+      h: this.container.h - this.#padding.t - this.#padding.b - this._indent - this._indent,
     };
   }
 
@@ -262,6 +263,9 @@ export default class Widget extends EventSource {
 
   // eslint-disable-next-line class-methods-use-this
   _eventKeyDown() { }
+
+  // eslint-disable-next-line class-methods-use-this
+  _eventMouseWheel() {}
 
   setContainer(x, y, w, h) {
     if (

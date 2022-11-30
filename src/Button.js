@@ -6,8 +6,6 @@ export default class Button extends Container {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this.setPadding(5, 5, 5, 5);
-
     if (new.target === Button) {
       Object.preventExtensions(this);
     }
@@ -16,6 +14,13 @@ export default class Button extends Container {
   _draw(canvasCtx, depth = 0) {
     if (this.constructor.name === 'Button') {
       this._logme(depth);
+    }
+
+    // Theme changed
+    const info = this.theme.getPartInfo(Theme.Parts.Button);
+    if (this._indent !== info.bgIndent) {
+      this._indent = info.bgIndent + 2;
+      this._performLayout();
     }
 
     let part = Theme.Parts.Button;

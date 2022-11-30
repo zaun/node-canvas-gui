@@ -15,6 +15,7 @@ import {
   Image,
   Input,
   makeLabelButton,
+  List,
 } from '../src/index.js';
 
 // Widget.debug = true;
@@ -36,7 +37,7 @@ const windowContext = windowCanvas.getContext('2d');
 
 const makeMenuButton = (label, fn) => {
   const btn = makeLabelButton(label);
-  btn.fixedHeight = 50;
+  btn.fixedHeight = 40;
 
   if (fn) {
     btn.onMouseClick = fn;
@@ -71,7 +72,7 @@ root.theme = Theme.Themes.Eagle;
 // Add a Container for menu
 const menu = new Container(root, 'Menu');
 menu.orientation = Container.Orientation.Vertical;
-menu.fixedWidth = global.window.width / 5;
+menu.fixedWidth = global.window.width / 6;
 menu.setPadding(0, 0, 0, 10);
 
 // Add a panel for display
@@ -168,6 +169,83 @@ menu.addChild(makeMenuButton('Label', () => {
   h.addChild(spacerA);
   h.addChild(v);
   h.addChild(spacerA);
+
+  display.addChild(h);
+}));
+
+menu.addChild(makeMenuButton('List', () => {
+  display.removeChildren();
+
+  const list = new List();
+  list.itemHeight = 30;
+  list.items = [
+    'Yellow',
+    'Yellow Green',
+    'Violet Red',
+    'Violet',
+    'Wheat',
+    'Turquoise',
+    'Tomato',
+    'Thistle',
+    'Tan',
+    'Steel Blue',
+    'Spring Green',
+    'Slate Gray',
+    'Sky Blue',
+    'Sienna',
+    'Sea Green',
+    'Salmon',
+    'Orange Red',
+    'Navy Blue',
+    'Lime Green',
+    'Light Sea Green',
+    'Hot Pink',
+    'Dark Green',
+    'Blue',
+    'Black',
+    'Brown',
+    'Alice Blue',
+    'Antique White',
+    'Aquamarine',
+    'Azure',
+    'Blanched Almond',
+    'Blue Violet',
+    'Burlywood',
+    'Cadet Blue',
+    'Chartreuse',
+    'Chocolate',
+    'Coral',
+    'Cornflower Blue',
+    'Cornsilk',
+    'Cyan',
+    'Dark Goldenrod',
+    'Dark Olive Green',
+    'Deep Pink',
+    'Deep Sky Blue',
+    'Dim Gray',
+    'Dodger Blue',
+    'Firebrick',
+    'Forest Green',
+    'Gold',
+    'Gray',
+    'Indian Red',
+  ];
+  list.itemCreate = (i) => {
+    const l = new Label();
+    l.text = i;
+    l.fontSize = 20;
+    return l;
+  };
+
+  const p = new Panel(null, 'test');
+  p.addChild(list);
+
+  const h = new Container();
+  h.orientation = Container.Orientation.Horizontal;
+  h.addChild(new Widget());
+  h.addChild(p);
+  h.addChild(new Widget());
+  h.setPadding(40, 40, 0, 0);
 
   display.addChild(h);
 }));
