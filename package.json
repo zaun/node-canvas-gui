@@ -24,11 +24,12 @@
     "test"
   ],
   "dependencies": {
+    "@khanacademy/simple-markdown": "^0.8.6",
     "synchronized-promise": "^0.3.1"
   },
   "devDependencies": {
-    "@kmamal/sdl": "^0.4.x",
     "@jest/globals": "^29.2.1",
+    "@kmamal/sdl": "^0.4.x",
     "eslint": "^8.26.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",

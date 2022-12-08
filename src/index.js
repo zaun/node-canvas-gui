@@ -12,6 +12,7 @@ import List from './List.js';
 import Button from './Button.js';
 import Image from './Image.js';
 import Input from './Input.js';
+import Text from './Text.js';
 
 const filename = fileURLToPath(import.meta.url);
 const importPath = dirname(filename);
@@ -49,5 +50,6 @@ export {
   Button,
   Image,
   Input,
+  Text,
   makeLabelButton,
 };

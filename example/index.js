@@ -16,6 +16,7 @@ import {
   Input,
   makeLabelButton,
   List,
+  // Text,
 } from '../src/index.js';
 
 // Widget.debug = true;
@@ -68,6 +69,82 @@ root.orientation = Container.Orientation.Horizontal;
 root.eventSource = global.window;
 root.setContainer(0, 0, global.window.width, global.window.height);
 root.theme = Theme.Themes.Eagle;
+
+// const tmp = new Text(root, 'test');
+// tmp.setPadding(10, 10, 10, 10);
+// tmp.text = `
+// # Header 1
+
+// ## Header 2
+
+// ### Header 3
+
+// #### Header 4
+
+// ##### Header 5
+
+// ###### Header 6
+
+// Here is a paragraph.
+// Here is an *em tag*.
+// Here is a **bold tag**.
+// Here is a __underline tag__.
+// Here is a ***em and bold tag***.
+// Here is a **__bold and underline tag__**.
+// Here is an ***__em bold and underline tag__***.
+// Here is \`\`inline code\`\`.
+
+// ---
+
+// New paragraph starts here.
+
+// > Dorothy followed her through many of the beautiful rooms in her castle.
+
+// > Dorothy followed her through many of the beautiful rooms in her castle.
+// > The Witch bade her clean the pots and kettles and sweep the floor and
+//   keep the fire fed with wood.
+
+// > warn <
+// > Dorothy followed her through many of the beautiful rooms in her castle.
+// >
+// > The Witch bade her clean the pots and kettles and sweep the floor and
+//   keep the fire fed with wood.
+
+// > info <
+// > Testing
+
+// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
+// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
+// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
+// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
+// Test Test Test Test Test Test Test Test Test Test Test Test
+
+// Standard Ordered List:
+
+// 1. First Item
+// 1. Second Item
+// 1. Third Item
+
+// Ordered List starting at 10:
+
+// 10. First Item
+// 10. Second Item
+// 10. Third Item
+
+// Unordered List:
+
+// * First Item
+// * Second Item
+// * Third Item
+
+// \`\`\`json
+// {
+//   "a": "Apples",
+//   "b": "Bananas",
+//   "c": "Cantalopes"
+// }
+// \`\`\`
+// `;
 
 // Add a Container for menu
 const menu = new Container(root, 'Menu');
