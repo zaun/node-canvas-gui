@@ -1,8 +1,15 @@
+import Canvas from 'canvas';
 import crypto from 'crypto';
-import Theme from './Theme.js';
+import Colors from './Colors.js';
 import Widget from './Widget.js';
 
 export default class Input extends Widget {
+  static Size = {
+    Large: 'Large',
+    Medium: 'Medium',
+    Small: 'Small',
+  };
+
   static #blink = false;
   static #blinker;
 
@@ -13,32 +20,79 @@ export default class Input extends Widget {
     Input.#blinker.unref();
   }
 
-  #value = '';
-  #placeholder = 'Enter your full name...';
-  #offset = 0;
+  _placeholder = 'Enter your full name...';
+  _offset = 0;
 
   #font = 'sans';
   #size = -1; // Default to auto-font size
 
+  #borderColor = '';
+  #borderWidth = 4;
+  #radii = [6, 6, 6, 6];
+
+  _text = '';
+
+  _fontSize = 0;
+  _font = 'sans';
+
+  _foregroundColor = '';
+  _backgroundColor = '';
+  _view = null;
+  _cursorPos = 0;
+
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this.fixedHeight = 49;
-    const info = this.theme.getPartInfo(Theme.Parts.InputBackground);
-    this._indent = info.bgIndent + 2;
-    this.setPadding(3, 3, 3, 3);
+    this.setSize(Input.Size.Medium);
+    this.setColor(Colors.White);
 
     if (new.target === Input) {
       Object.preventExtensions(this);
     }
   }
 
+  set backgroundColor(val) {
+    this._backgroundColor = val;
+    this._performLayout();
+  }
+
+  get backgroundColor() {
+    return this._backgroundColor;
+  }
+
+  set borderColor(val) {
+    this._borderColor = val;
+    this._performLayout();
+  }
+
+  get borderColor() {
+    return this._borderColor;
+  }
+
+  set borderWidth(val) {
+    this.#borderWidth = val * 4;
+  }
+
+  get borderWidth() {
+    return this.#borderWidth / 4;
+  }
+
+  set foregroundColor(val) {
+    this._foregroundColor = val;
+    this._performLayout();
+  }
+
+  get foregroundColor() {
+    return this._foregroundColor;
+  }
+
   get value() {
-    return this.#value;
+    return this._text;
   }
 
   set value(val) {
-    this.#value = val.toString();
+    this._text = val.toString();
+    this._performLayout();
   }
 
   get font() {
@@ -47,6 +101,7 @@ export default class Input extends Widget {
 
   set font(val) {
     this.#font = val;
+    this._performLayout();
   }
 
   get fontSize() {
@@ -55,6 +110,41 @@ export default class Input extends Widget {
 
   set fontSize(val) {
     this.#size = val;
+    this._performLayout();
+  }
+
+  setColor(val) {
+    this._backgroundColor = val;
+    this._borderColor = Colors.darker(val);
+    this._foregroundColor = Colors.foregroundFor(this._backgroundColor);
+    if (this._backgroundColor === Colors.White) {
+      this._borderColor = Colors.Black;
+    }
+  }
+
+  setSize(size) {
+    switch (size) {
+      case Input.Size.Large:
+        this.fixedHeight = 48;
+        this._fontSize = 20;
+        this.#radii = [8, 8, 8, 8];
+        this.setPadding(8, 8, 16, 16);
+        break;
+      case Input.Size.Medium:
+        this.fixedHeight = 38;
+        this._fontSize = 16;
+        this.#radii = [6, 6, 6, 6];
+        this.setPadding(6, 6, 12, 12);
+        break;
+      case Input.Size.Small:
+        this.fixedHeight = 31;
+        this._fontSize = 14;
+        this.#radii = [4, 4, 4, 4];
+        this.setPadding(4, 4, 8, 8);
+        break;
+      default:
+        throw Error('Invalid size');
+    }
   }
 
   _eventKeyDown(event) {
@@ -67,7 +157,8 @@ export default class Input extends Widget {
     }
     if (key === 'backspace') {
       key = '';
-      this.#value = this.#value.slice(0, -1);
+      this._text = this._text.slice(0, -1);
+      this._performLayout();
       return;
     }
     if (key.length > 1) {
@@ -78,7 +169,39 @@ export default class Input extends Widget {
     if (event.shift || event.capslock) {
       key = key.toUpperCase();
     }
-    this.#value += key;
+    this._text += key;
+    this._performLayout();
+  }
+
+  _performLayout() {
+    this._view = Canvas.createCanvas(this.body.w, this.body.h);
+    const viewCtx = this._view.getContext('2d');
+
+    viewCtx.fillStyle = this._foregroundColor;
+    if (this._text === '') {
+      viewCtx.fillStyle += 'aa';
+    }
+    viewCtx.font = `${this._fontSize}px ${this._font}`;
+
+    const chInfo = viewCtx.measureText(this._text || this._placeholder);
+
+    // Scroll text if it wont all fit
+    this._offset = chInfo.width > this.body.w - 5 ? chInfo.width - (this.body.w - 5) : 0;
+
+    const x = this.body.x - this._offset;
+    let y = this.body.y + (this.body.h / 2);
+    y += (chInfo.emHeightAscent / 2);
+    y -= (chInfo.emHeightDescent / 2);
+
+    viewCtx.font = `${this._fontSize}px ${this._font}`;
+
+    viewCtx.clearRect(0, 0, this.body.w, this.body.h);
+    viewCtx.fillText(this._text || this._placeholder, x - this.body.x, y - this.body.y);
+
+    this._cursorPos = x + chInfo.width + 2;
+    if (this._text === '') {
+      this._cursorPos = x;
+    }
   }
 
   _draw(canvasCtx, depth = 0) {
@@ -87,70 +210,42 @@ export default class Input extends Widget {
       this._logme(depth);
     }
 
-    let background = this.theme.colors.action;
-    if (this._mouseHover) {
-      background = this.theme.colors.actionHighlight;
-    }
+    canvasCtx.beginPath();
 
-    this.theme.draw9slice(
-      canvasCtx,
-      Theme.Parts.InputBackground,
+    canvasCtx.lineWidth = this.#borderWidth;
+    canvasCtx.fillStyle = this._backgroundColor;
+    canvasCtx.strokeStyle = this._borderColor;
+
+    canvasCtx.roundRect(
       this.container.x,
       this.container.y,
       this.container.w,
       this.container.h,
-      background,
+      this.#radii,
     );
 
-    canvasCtx.save();
-    canvasCtx.rect(this.body.x, this.body.y, this.body.w, this.body.h);
-    canvasCtx.clip();
+    canvasCtx.stroke();
+    canvasCtx.fill();
 
-    // Set the font color
-    canvasCtx.fillStyle = this.theme.colors.actionForeground;
-    if (this.#value === '') {
-      canvasCtx.fillStyle = this.theme.colors.actionLightForeground;
-    }
-
-    // Calculate max font size if set font size is -1
-    let fontSize = this.#size === -1 ? 0.5 : this.#size;
-    let chInfo = null;
-    let lineHeight = 0;
-    do {
-      fontSize += 0.5;
-      canvasCtx.font = `${fontSize}px ${this.#font}`;
-      chInfo = canvasCtx.measureText('$');
-      lineHeight = chInfo.emHeightAscent + chInfo.emHeightDescent + 2;
-    } while (this.#size === -1 && lineHeight < this.body.h);
-
-    // Scroll text if it wont all fit
-    const lineWidth = canvasCtx.measureText(this.#value).width;
-    this.#offset = lineWidth > this.body.w - 5 ? lineWidth - (this.body.w - 5) : 0;
-
-    const x = this.body.x - this.#offset;
-    let y = this.body.y + (this.body.h / 2);
-    y += (chInfo.emHeightAscent / 2);
-    y -= (chInfo.emHeightDescent / 2);
-
-    canvasCtx.fillText(this.#value || this.#placeholder, x, y);
-
-    // Draw the text baseline
-    // canvasCtx.beginPath();
-    // canvasCtx.moveTo(this.body.x, y);
-    // canvasCtx.lineTo(this.body.x + this.body.w, y);
-    // canvasCtx.stroke();
-
-    const lineX = x + lineWidth + 2;
+    canvasCtx.drawImage(
+      this._view,
+      0,
+      0,
+      this.body.w,
+      this.body.h,
+      this.body.x,
+      this.body.y,
+      this.body.w,
+      this.body.h,
+    );
 
     if (this._mouseHover && Input.#blink) {
       canvasCtx.lineWidth = 2;
-      canvasCtx.strokeStyle = '#0000000';
+      canvasCtx.strokeStyle = this._foregroundColor;
       canvasCtx.beginPath();
-      canvasCtx.moveTo(lineX, this.body.y);
-      canvasCtx.lineTo(lineX, this.body.y + this.body.h);
+      canvasCtx.moveTo(this._cursorPos, this.body.y + 1);
+      canvasCtx.lineTo(this._cursorPos, this.body.y + this.body.h - 2);
       canvasCtx.stroke();
     }
-
-    canvasCtx.restore();
   }
 }

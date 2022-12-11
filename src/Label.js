@@ -1,28 +1,8 @@
 import crypto from 'crypto';
+import Colors from './Colors.js';
 import Widget from './Widget.js';
 
 export default class Label extends Widget {
-  static #Fonts = {
-    Sans: 'sans',
-    Serif: 'serif',
-    KenneyBlocks: 'Kenney_Blocks',
-    KenneyFuture: 'Kenney_Future',
-    KenneyFutureNarrow: 'Kenney_Future_Narrow',
-    KenneyHigh: 'Kenney_High',
-    KenneyHighSquare: 'Kenney_High_Square',
-    KenneyMiniSquareMono: 'Kenney_Mini_Square_Mono',
-    KenneyMiniSquare: 'Kenney_Mini_Square',
-    KenneyMini: 'Kenney_Mini',
-    KenneyPixelSquare: 'Kenney_Pixel_Square',
-    KenneyPixel: 'Kenney_Pixel',
-    KenneyRocketSquare: 'Kenney_Rocket_Square',
-    KenneyRocket: 'Kenney_Rocket',
-  };
-
-  static get Fonts() {
-    return Label.#Fonts;
-  }
-
   #text = '';
   #font = 'sans';
   #size = -1; // Default to auto-font size
@@ -94,7 +74,7 @@ export default class Label extends Widget {
       lineHeight = chInfo.emHeightAscent + chInfo.emHeightDescent + 2;
     } while (this.#size === -1 && (lineHeight * lines.length) < this.body.h);
 
-    canvasCtx.fillStyle = this.#foreground === '' ? this.theme.colors.foreground : this.#foreground;
+    canvasCtx.fillStyle = this.#foreground === '' ? Colors.Black : this.#foreground;
 
     let maxWidth = 0;
     for (let i = 0; i < lines.length; i += 1) {

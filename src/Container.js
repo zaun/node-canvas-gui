@@ -13,6 +13,7 @@ export default class Container extends Widget {
 
   _orientation = Container.Orientation.Horizontal;
   #children = [];
+  #spacing = 5;
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
@@ -41,7 +42,17 @@ export default class Container extends Widget {
     }
   }
 
+  get spacing() {
+    return this.#spacing;
+  }
+
+  set spacing(val) {
+    this.#spacing = val;
+    this._performLayout();
+  }
+
   _performLayout() {
+    let totalSpacing = 0;
     let childWidth = 0;
     let childHeight = 0;
     let fixed = 0;
@@ -59,14 +70,18 @@ export default class Container extends Widget {
           }
         });
 
-        childWidth = Math.ceil((this.body.w - fixed) / childCount);
+        totalSpacing = (this.#spacing * (childCount - 1));
+        childWidth = Math.ceil((this.body.w - fixed - totalSpacing) / childCount);
+        if (childWidth < 0) {
+          childWidth = 0;
+        }
         childHeight = this.body.h;
 
         this.#children.forEach((w) => {
           if (!w._absolutePosition) {
             const newWidth = w.fixedWidth === 0 ? childWidth : w.fixedWidth;
             w.setContainer(this.body.x + offset, this.body.y, newWidth, childHeight);
-            offset += newWidth;
+            offset += newWidth + this.#spacing;
           }
         });
         break;
@@ -79,13 +94,17 @@ export default class Container extends Widget {
           }
         });
 
+        totalSpacing = (this.#spacing * (childCount - 1));
         childWidth = this.body.w;
-        childHeight = Math.ceil((this.body.h - fixed) / childCount);
+        childHeight = Math.ceil((this.body.h - fixed - totalSpacing) / childCount);
+        if (childHeight < 0) {
+          childHeight = 0;
+        }
 
         this.#children.forEach((w) => {
           const newHeight = w.fixedHeight === 0 ? childHeight : w.fixedHeight;
           w.setContainer(this.body.x, this.body.y + offset, childWidth, newHeight);
-          offset += newHeight;
+          offset += newHeight + this.#spacing;
         });
         break;
 

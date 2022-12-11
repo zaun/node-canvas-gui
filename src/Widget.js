@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import EventSource from './EventSource.js';
-import Theme from './Theme.js';
 
 export default class Widget extends EventSource {
   static #debug = false;
@@ -36,10 +35,9 @@ export default class Widget extends EventSource {
   };
 
   // extended classes need access to these.
-  _indent = 0; // indent for body that is not use controlled. Set by widget based on theme
+  _indent = 0; // indent for body that is not use controlled. Set by widget based
   _absolutePosition = false;
   _parent = null;
-  _theme = null;
   _mousePosX = 0;
   _mousePosY = 0;
   _mouseHover = false;
@@ -54,18 +52,10 @@ export default class Widget extends EventSource {
     a: 0,
   };
 
-  constructor(parent = null, name = crypto.randomUUID(), themeColor = Theme.Themes.Inherit) {
+  constructor(parent = null, name = crypto.randomUUID()) {
     super();
 
     this.#name = name;
-
-    if (themeColor) {
-      if (themeColor === Theme.Themes.Inherit) {
-        this._theme = null;
-      } else {
-        this._theme = new Theme(themeColor);
-      }
-    }
 
     if (parent !== null && parent.addChild) {
       parent.addChild(this);
@@ -79,11 +69,24 @@ export default class Widget extends EventSource {
   }
 
   get body() {
+    let x = this.container.x + this.#padding.l + this._indent;
+    if (x < 0) {
+      x = 0;
+    }
+    let y = this.container.y + this.#padding.t + this._indent;
+    if (y < 0) {
+      y = 0;
+    }
+    let w = this.container.w - this.#padding.l - this.#padding.r - this._indent - this._indent;
+    if (w < 0) {
+      w = 0;
+    }
+    let h = this.container.h - this.#padding.t - this.#padding.b - this._indent - this._indent;
+    if (h < 0) {
+      h = 0;
+    }
     return {
-      x: this.container.x + this.#padding.l + this._indent,
-      y: this.container.y + this.#padding.t + this._indent,
-      w: this.container.w - this.#padding.l - this.#padding.r - this._indent - this._indent,
-      h: this.container.h - this.#padding.t - this.#padding.b - this._indent - this._indent,
+      x, y, w, h,
     };
   }
 
@@ -156,6 +159,10 @@ export default class Widget extends EventSource {
   }
 
   set fixedHeight(val) {
+    if (val < 0) {
+      throw Error('Widget \'fixedHeight\' must be greater to or equal to 0.');
+    }
+
     if (this.#fixedHeight !== val) {
       this.#fixedHeight = val;
       if (this._parent) {
@@ -169,6 +176,10 @@ export default class Widget extends EventSource {
   }
 
   set fixedWidth(val) {
+    if (val < 0) {
+      throw Error('Widget \'fixedWidth\' must be greater to or equal to 0.');
+    }
+
     if (this.#fixedWidth !== val) {
       this.#fixedWidth = val;
       if (this._parent) {
@@ -184,30 +195,6 @@ export default class Widget extends EventSource {
   set parent(val) {
     this._parent = val;
     if (this._parent && this._parent._performLayout) {
-      this._parent._performLayout();
-    }
-  }
-
-  get theme() {
-    if (this._theme === null) {
-      if (this._parent !== null) {
-        return this._parent.theme;
-      }
-      return Theme.default;
-    }
-    return this._theme;
-  }
-
-  set theme(val) {
-    if (val) {
-      if (val === Theme.Themes.Inherit) {
-        this._theme = null;
-      } else {
-        this._theme = new Theme(val);
-      }
-    }
-
-    if (this._parent) {
       this._parent._performLayout();
     }
   }
@@ -267,22 +254,48 @@ export default class Widget extends EventSource {
   // eslint-disable-next-line class-methods-use-this
   _eventMouseWheel() {}
 
-  setContainer(x, y, w, h) {
+  setContainer(x, y, width, height) {
+    if (x < 0) {
+      throw Error('Container \'x\' location must be greater to or equal to 0.');
+    }
+    if (y < 0) {
+      throw Error('Container \'y\' location must be greater to or equal to 0.');
+    }
+    if (width < 0) {
+      throw Error('Container \'width\' location must be greater to or equal to 0.');
+    }
+    if (height < 0) {
+      throw Error('Container \'height\' location must be greater to or equal to 0.');
+    }
+
     if (
       this.#container.x !== x
       || this.#container.y !== y
-      || this.#container.w !== w
-      || this.#container.h !== h
+      || this.#container.w !== width
+      || this.#container.h !== height
     ) {
       this.#container.x = x;
       this.#container.y = y;
-      this.#container.w = w;
-      this.#container.h = h;
+      this.#container.w = width;
+      this.#container.h = height;
       this._performLayout();
     }
   }
 
   setPadding(top, bottom, left, right) {
+    if (top < 0) {
+      throw Error('Padding \'top\' location must be greater to or equal to 0.');
+    }
+    if (bottom < 0) {
+      throw Error('Padding \'bottom\' location must be greater to or equal to 0.');
+    }
+    if (left < 0) {
+      throw Error('Padding \'left\' location must be greater to or equal to 0.');
+    }
+    if (right < 0) {
+      throw Error('Padding \'right\' location must be greater to or equal to 0.');
+    }
+
     this.#padding = {
       t: top,
       b: bottom,
@@ -292,6 +305,8 @@ export default class Widget extends EventSource {
 
     if (this._parent) {
       this._parent._performLayout();
+    } else {
+      this._performLayout();
     }
   }
 

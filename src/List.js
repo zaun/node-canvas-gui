@@ -87,7 +87,6 @@ export default class List extends Widget {
 
   _performLayout() {
     this.#itemWidgets = [];
-
     this.#view = Canvas.createCanvas(this.body.w, this.#itemHeight * this.#items.length);
     const viewCtx = this.#view.getContext('2d');
 

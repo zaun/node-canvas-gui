@@ -2,7 +2,6 @@ import crypto from 'crypto';
 import Widget from './Widget.js';
 import Container from './Container.js';
 import Panel from './Panel.js';
-import Theme from './Theme.js';
 
 // Force a fullscreen dialog that will prevent
 // mouse clicks from propigating to items below it.
@@ -53,17 +52,6 @@ export default class ModalDialog extends Container {
 
   set fixedWidth(val) {
     this.#modalCenter.fixedWidth = val;
-  }
-
-  get theme() {
-    if (this.#modalRoot.theme === Theme.Themes.Inherit && this.parent) {
-      return this.parent.theme;
-    }
-    return this.#modalRoot.theme;
-  }
-
-  set theme(val) {
-    this.#modalRoot.theme = val;
   }
 
   set onMouseClick(val) {

@@ -1,11 +1,8 @@
-import { registerFont } from 'canvas';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
 import Widget from './Widget.js';
 import Container from './Container.js';
 import ModalDialog from './ModalDialog.js';
-import Theme from './Theme.js';
+import Colors from './Colors.js';
+import Fonts from './Fonts.js';
 import Panel from './Panel.js';
 import Label from './Label.js';
 import List from './List.js';
@@ -14,36 +11,32 @@ import Image from './Image.js';
 import Input from './Input.js';
 import Text from './Text.js';
 
-const filename = fileURLToPath(import.meta.url);
-const importPath = dirname(filename);
-const fontPath = `${importPath}/../fonts`;
-
-registerFont(`${fontPath}/Kenney Blocks.ttf`, { family: 'Kenney_Blocks' });
-registerFont(`${fontPath}/Kenney Future Narrow.ttf`, { family: 'Kenney_Future_Narrow' });
-registerFont(`${fontPath}/Kenney Future.ttf`, { family: 'Kenney_Future' });
-registerFont(`${fontPath}/Kenney High Square.ttf`, { family: 'Kenney_High_Square' });
-registerFont(`${fontPath}/Kenney High.ttf`, { family: 'Kenney_High' });
-registerFont(`${fontPath}/Kenney Mini Square Mono.ttf`, { family: 'Kenney_Mini_Square_Mono' });
-registerFont(`${fontPath}/Kenney Mini Square.ttf`, { family: 'Kenney_Mini_Square' });
-registerFont(`${fontPath}/Kenney Mini.ttf`, { family: 'Kenney_Mini' });
-registerFont(`${fontPath}/Kenney Pixel Square.ttf`, { family: 'Kenney_Pixel_Square' });
-registerFont(`${fontPath}/Kenney Pixel.ttf`, { family: 'Kenney_Pixel' });
-registerFont(`${fontPath}/Kenney Rocket Square.ttf`, { family: 'Kenney_Rocket_Square' });
-registerFont(`${fontPath}/Kenney Rocket.ttf`, { family: 'Kenney_Rocket' });
-
-const makeLabelButton = (text = '', parent = null, name = '') => {
-  const button = new Button(parent, name);
-  const label = new Label(button);
-  label.text = text;
-  label.foreground = label.theme.colors.actionForeground;
-  return button;
-};
+Fonts.addFont('Beyond Wonderland', 'Beyond Wonderland.ttf');
+Fonts.addFont('Kenney Blocks', 'Kenney Blocks.ttf');
+Fonts.addFont('Kenney Future Narrow', 'Kenney Future Narrow.ttf');
+Fonts.addFont('Kenney Future', 'Kenney Future.ttf');
+Fonts.addFont('Kenney High Square', 'Kenney High Square.ttf');
+Fonts.addFont('Kenney High', 'Kenney High.ttf');
+Fonts.addFont('Kenney Mini Square Mono', 'Kenney Mini Square Mono.ttf');
+Fonts.addFont('Kenney Mini Square', 'Kenney Mini Square.ttf');
+Fonts.addFont('Kenney Mini', 'Kenney Mini.ttf');
+Fonts.addFont('Kenney Pixel Square', 'Kenney Pixel Square.ttf');
+Fonts.addFont('Kenney Pixel', 'Kenney Pixel.ttf');
+Fonts.addFont('Kenney Rocket Square', 'Kenney Rocket Square.ttf');
+Fonts.addFont('Kenney Rocket', 'Kenney Rocket.ttf');
+Fonts.addFont('SF Atarian System', 'SF Atarian System.ttf');
+Fonts.addFont('Zombie Holocaust', 'Zombie Holocaust.ttf');
+Fonts.addFont('Rothenburg Decorative', 'RothenburgDecorative.ttf');
+Fonts.addFont('Black Ops One', 'BlackOpsOne-Regular.ttf');
+Fonts.addFont('Tall Film', 'Tall Film.ttf');
+Fonts.addFont('Sulphur Point', 'SulphurPoint-Regular.ttf');
 
 export {
   Widget,
   Container,
   ModalDialog,
-  Theme,
+  Colors,
+  Fonts,
   Panel,
   Label,
   List,
@@ -51,5 +44,4 @@ export {
   Image,
   Input,
   Text,
-  makeLabelButton,
 };
