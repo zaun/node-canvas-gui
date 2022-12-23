@@ -9,6 +9,7 @@ const fontPath = `${importPath}/../fonts`;
 const fonts = {
   Sans: 'sans',
   Serif: 'serif',
+  Monospace: 'monospace',
   addFont(name, fontFileName) {
     fonts[name.replace(/ /g, '')] = name.replace(/ /g, '_');
     registerFont(`${fontPath}/${fontFileName}`, { family: name.replace(/ /g, '_') });

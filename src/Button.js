@@ -21,19 +21,19 @@ export default class Button extends Widget {
 
   #radii = [6, 6, 6, 6];
 
-  _mode = Button.Mode.Default;
+  #mode = Button.Mode.Default;
 
-  _text = '';
+  #text = '';
 
-  _fontSize = 0;
-  _font = 'sans';
+  #fontSize = 0;
+  #font = 'sans';
 
-  _foregroundColor = '';
-  _backgroundColor = '';
-  _hoverForegroundColor = '';
-  _hoverBackgroundColor = '';
-  _hoverBorderColor = '';
-  _view = null;
+  #foregroundColor = '';
+  #backgroundColor = '';
+  #hoverForegroundColor = '';
+  #hoverBackgroundColor = '';
+  #hoverBorderColor = '';
+  #view = null;
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
@@ -47,12 +47,12 @@ export default class Button extends Widget {
   }
 
   set backgroundColor(val) {
-    this._backgroundColor = val;
+    this.#backgroundColor = val;
     this._performLayout();
   }
 
   get backgroundColor() {
-    return this._backgroundColor;
+    return this.#backgroundColor;
   }
 
   set borderColor(val) {
@@ -73,144 +73,151 @@ export default class Button extends Widget {
   }
 
   set foregroundColor(val) {
-    this._foregroundColor = val;
+    this.#foregroundColor = val;
     this._performLayout();
   }
 
   get foregroundColor() {
-    return this._foregroundColor;
+    return this.#foregroundColor;
   }
 
   set hoverBackgroundColor(val) {
-    this._hoverBackgroundColor = val;
+    this.#hoverBackgroundColor = val;
     this._performLayout();
   }
 
   get hoverBackgroundColor() {
-    return this._hoverBackgroundColor;
+    return this.#hoverBackgroundColor;
   }
 
   set hoverBorderColor(val) {
-    this._hoverBorderColor = val;
+    this.#hoverBorderColor = val;
     this._performLayout();
   }
 
   get hoverBorderColor() {
-    return this._hoverBorderColor;
+    return this.#hoverBorderColor;
   }
 
   set mode(val) {
-    this._mode = val;
+    this.#mode = val;
     this._performLayout();
   }
 
   get mode() {
-    return this._mode;
+    return this.#mode;
   }
 
   set text(val) {
-    this._text = val;
+    this.#text = val;
     this._performLayout();
   }
 
   get text() {
-    return this._text;
+    return this.#text;
   }
 
-  get _calcBackground() {
-    let backgroundColor = this._backgroundColor;
+  get #calcBackground() {
+    let backgroundColor = this.#backgroundColor;
 
     if (this._mouseHover) {
-      backgroundColor = this._hoverBackgroundColor;
+      backgroundColor = this.#hoverBackgroundColor;
     }
 
     return backgroundColor;
   }
 
-  get _calcBorder() {
+  get #calcBorder() {
     let borderColor = this.#borderColor;
 
     if (this._mouseHover) {
-      borderColor = this._hoverBorderColor;
+      borderColor = this.#hoverBorderColor;
     }
 
     return borderColor;
   }
 
-  get _calcForeground() {
-    let foregroundColor = this._foregroundColor;
+  get #calcForeground() {
+    let foregroundColor = this.#foregroundColor;
 
     if (!this._mouseHover && this.mode === Button.Mode.Outline) {
-      foregroundColor = this._backgroundColor;
+      foregroundColor = this.#backgroundColor;
     }
 
     if (this._mouseHover && this.mode !== Button.Mode.Outline) {
-      foregroundColor = this._hoverForegroundColor;
+      foregroundColor = this.#hoverForegroundColor;
     }
 
     if (this._mouseHover && this.mode === Button.Mode.Outline) {
-      foregroundColor = this._hoverBackgroundColor;
+      foregroundColor = this.#hoverBackgroundColor;
     }
 
     return foregroundColor;
   }
 
   setColor(val) {
-    this._backgroundColor = val;
+    this.#backgroundColor = val;
     this.#borderColor = Colors.darker(val);
-    this._foregroundColor = Colors.foregroundFor(this._backgroundColor);
-    this._hoverBackgroundColor = Colors.darker(val);
-    this._hoverBorderColor = Colors.darker(val);
-    this._hoverForegroundColor = Colors.foregroundFor(this._hoverBackgroundColor);
+    this.#foregroundColor = Colors.foregroundFor(this.#backgroundColor);
+    this.#hoverBackgroundColor = Colors.darker(val);
+    this.#hoverBorderColor = Colors.darker(val);
+    this.#hoverForegroundColor = Colors.foregroundFor(this.#hoverBackgroundColor);
+    this._performLayout();
   }
 
   setSize(size) {
     switch (size) {
       case Button.Size.Large:
         this.fixedHeight = 48;
-        this._fontSize = 20;
-        this.#radii = [8, 8, 8, 8];
-        this.setPadding(8, 8, 16, 16);
+        this.fontSize = 20;
+        this.radii = [8, 8, 8, 8];
+        this.padding = [8, 8, 16, 16];
         break;
       case Button.Size.Medium:
         this.fixedHeight = 38;
-        this._fontSize = 16;
-        this.#radii = [6, 6, 6, 6];
-        this.setPadding(6, 6, 12, 12);
+        this.#fontSize = 16;
+        this.radii = [6, 6, 6, 6];
+        this.padding = [6, 6, 12, 12];
         break;
       case Button.Size.Small:
         this.fixedHeight = 31;
-        this._fontSize = 14;
-        this.#radii = [4, 4, 4, 4];
-        this.setPadding(4, 4, 8, 8);
+        this.fontSize = 14;
+        this.radii = [4, 4, 4, 4];
+        this.padding = [4, 4, 8, 8];
         break;
       default:
         throw Error('Invalid size');
     }
+    this._performLayout();
   }
 
   _performLayout() {
-    this._view = Canvas.createCanvas(this.body.w, this.body.h);
-    const viewCtx = this._view.getContext('2d');
+    try {
+      this.#view = Canvas.createCanvas(this.body.w, this.body.h);
+      const viewCtx = this.#view.getContext('2d');
 
-    viewCtx.fillStyle = this._calcForeground;
-    viewCtx.font = `${this._fontSize}px ${this._font}`;
+      viewCtx.fillStyle = this.#calcForeground;
+      viewCtx.font = `${this.#fontSize}px ${this.#font}`;
 
-    const chInfo = viewCtx.measureText(this._text);
-    let x = this.body.x + (this.body.w / 2) - (chInfo.width / 2);
-    if (x < this.body.x) {
-      x = this.body.x;
+      const chInfo = viewCtx.measureText(this.#text);
+      let x = (this.body.w / 2) - (chInfo.width / 2);
+      if (x < 0) {
+        x = 0;
+      }
+
+      let y = this.body.h / 2;
+      y += (chInfo.emHeightAscent / 2);
+      y -= (chInfo.emHeightDescent / 2);
+
+      viewCtx.clearRect(0, 0, this.body.w, this.body.h);
+      viewCtx.fillText(this.#text, x, y);
+    } catch (e) {
+      // FIXME: I don't know why this is happening. It's like this
+      //        function is being called with the wrong 'this' sometimes.
+      // console.log(e);
+      // console.log(this.name, this.constructor.name, this.text);
+      // console.log(this.parent ? this.parent.name : '');
     }
-
-    let y = this.body.y + (this.body.h / 2);
-    y += (chInfo.emHeightAscent / 2);
-    y -= (chInfo.emHeightDescent / 2);
-
-    viewCtx.fillStyle = this._calcForeground;
-    viewCtx.font = `${this._fontSize}px ${this._font}`;
-
-    viewCtx.clearRect(0, 0, this.body.w, this.body.h);
-    viewCtx.fillText(this._text, x - this.body.x, y - this.body.y);
   }
 
   _draw(canvasCtx, depth = 0) {
@@ -221,8 +228,8 @@ export default class Button extends Widget {
     canvasCtx.beginPath();
 
     canvasCtx.lineWidth = this.#borderWidth;
-    canvasCtx.fillStyle = this._calcBackground;
-    canvasCtx.strokeStyle = this._calcBorder;
+    canvasCtx.fillStyle = this.#calcBackground;
+    canvasCtx.strokeStyle = this.#calcBorder;
 
     canvasCtx.roundRect(
       this.container.x + (canvasCtx.lineWidth / 2),
@@ -241,7 +248,7 @@ export default class Button extends Widget {
     }
 
     canvasCtx.drawImage(
-      this._view,
+      this.#view,
       0,
       0,
       this.body.w,

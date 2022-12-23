@@ -113,6 +113,22 @@ export default class Input extends Widget {
     this._performLayout();
   }
 
+  set radii(val) {
+    const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
+
+    if (!Number.isNaN(Number(val))) {
+      this.#radii = [val, val, val, val];
+    } else if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
+      this.#radii = val;
+    } else {
+      throw Error('Panel radii must be a number or an array of four numbers');
+    }
+  }
+
+  get radii() {
+    return this.#radii;
+  }
+
   setColor(val) {
     this._backgroundColor = val;
     this._borderColor = Colors.darker(val);
@@ -127,20 +143,20 @@ export default class Input extends Widget {
       case Input.Size.Large:
         this.fixedHeight = 48;
         this._fontSize = 20;
-        this.#radii = [8, 8, 8, 8];
-        this.setPadding(8, 8, 16, 16);
+        this.radii = [8, 8, 8, 8];
+        this.padding = [8, 8, 16, 16];
         break;
       case Input.Size.Medium:
         this.fixedHeight = 38;
         this._fontSize = 16;
-        this.#radii = [6, 6, 6, 6];
-        this.setPadding(6, 6, 12, 12);
+        this.radii = [6, 6, 6, 6];
+        this.padding = [6, 6, 12, 12];
         break;
       case Input.Size.Small:
         this.fixedHeight = 31;
         this._fontSize = 14;
-        this.#radii = [4, 4, 4, 4];
-        this.setPadding(4, 4, 8, 8);
+        this.radii = [4, 4, 4, 4];
+        this.padding = [4, 4, 8, 8];
         break;
       default:
         throw Error('Invalid size');

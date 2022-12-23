@@ -7,9 +7,8 @@ import Canvas from 'canvas';
 import {
   Widget,
   Container,
-  ModalDialog,
+  // ModalDialog,
   Colors,
-  Fonts,
   Panel,
   Label,
   // Button,
@@ -19,6 +18,10 @@ import {
   Button,
   // Text,
 } from '../src/index.js';
+
+import createButtonHelp from './buttonHelp.js';
+import createContainerHelp from './containerHelp.js';
+import createLabelHelp from './labelHelp.js';
 
 // Widget.debug = true;
 
@@ -38,7 +41,7 @@ const windowCanvas = Canvas.createCanvas(width, height);
 const windowContext = windowCanvas.getContext('2d');
 
 const makeMenuButton = (label, fn) => {
-  const btn = new Button();
+  const btn = new Button(null, label);
   btn.text = label;
 
   if (fn) {
@@ -64,132 +67,44 @@ const makeCenter = (widget) => {
   return h;
 };
 
+// const root = new Container();
+// const panel = new Panel(root);
+// panel.radii = 50;
+// panel.fixedWidth = 100;
+// const panelB = new Panel(root);
+// panelB.radii = 50;
+// panelB.fixedHeight = 100;
+// const panelC = new Panel(root);
+// panelC.radii = 50;
+
 // Setup the root Container for the GUI
 const root = new Container(null, 'Root');
 root.orientation = Container.Orientation.Horizontal;
 root.eventSource = global.window;
 root.setContainer(0, 0, global.window.width, global.window.height);
 
-// const tmp = new Text(root, 'test');
-// tmp.setPadding(10, 10, 10, 10);
-// tmp.text = `
-// # Header 1
-
-// ## Header 2
-
-// ### Header 3
-
-// #### Header 4
-
-// ##### Header 5
-
-// ###### Header 6
-
-// Here is a paragraph.
-// Here is an *em tag*.
-// Here is a **bold tag**.
-// Here is a __underline tag__.
-// Here is a ***em and bold tag***.
-// Here is a **__bold and underline tag__**.
-// Here is an ***__em bold and underline tag__***.
-// Here is \`\`inline code\`\`.
-
-// ---
-
-// New paragraph starts here.
-
-// > Dorothy followed her through many of the beautiful rooms in her castle.
-
-// > Dorothy followed her through many of the beautiful rooms in her castle.
-// > The Witch bade her clean the pots and kettles and sweep the floor and
-//   keep the fire fed with wood.
-
-// > warn <
-// > Dorothy followed her through many of the beautiful rooms in her castle.
-// >
-// > The Witch bade her clean the pots and kettles and sweep the floor and
-//   keep the fire fed with wood.
-
-// > info <
-// > Testing
-
-// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
-// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
-// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
-// Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test
-// Test Test Test Test Test Test Test Test Test Test Test Test
-
-// Standard Ordered List:
-
-// 1. First Item
-// 1. Second Item
-// 1. Third Item
-
-// Ordered List starting at 10:
-
-// 10. First Item
-// 10. Second Item
-// 10. Third Item
-
-// Unordered List:
-
-// * First Item
-// * Second Item
-// * Third Item
-
-// \`\`\`json
-// {
-//   "a": "Apples",
-//   "b": "Bananas",
-//   "c": "Cantalopes"
-// }
-// \`\`\`
-// `;
-
 // Add a Container for menu
 const menu = new Container(root, 'Menu');
 menu.orientation = Container.Orientation.Vertical;
 menu.fixedWidth = global.window.width / 6;
-menu.setPadding(5, 5, 5, 5);
+menu.padding = 5;
 
 // Add a panel for display
 const background = new Panel(root, 'Display Background');
-background.setPadding(10, 10, 10, 10);
+background.padding = 10;
 const display = new Container(background, 'Display');
 
 // Add widget examples
 menu.addChild(makeMenuButton('Button', () => {
   display.removeChildren();
-
-  const tmp = new Container();
-  tmp.orientation = Container.Orientation.Vertical;
-
-  const lblCount = new Label(tmp);
-  lblCount.text = 0;
-
-  const btns = new Container(tmp, 'Button Bar');
-  btns.fixedHeight = 50;
-
-  const btnAdd = new Button(btns);
-  btnAdd.text = '+1';
-  btnAdd.onMouseClick = () => {
-    lblCount.text = (parseInt(lblCount.text, 10) + 1);
-  };
-
-  const spacer = new Widget(null, 'Spacer');
-  btns.addChild(spacer);
-
-  const btnSub = new Button(btns);
-  btnSub.text = '-1';
-  btnSub.onMouseClick = () => {
-    lblCount.text = (parseInt(lblCount.text, 10) - 1);
-  };
-
-  display.addChild(makeCenter(tmp));
+  const buttonScreen = createButtonHelp();
+  display.addChild(buttonScreen);
 }));
 
 menu.addChild(makeMenuButton('Container', () => {
   display.removeChildren();
+  const containerScreen = createContainerHelp();
+  display.addChild(containerScreen);
 }));
 
 menu.addChild(makeMenuButton('Image', () => {
@@ -203,49 +118,8 @@ menu.addChild(makeMenuButton('Image', () => {
 
 menu.addChild(makeMenuButton('Label', () => {
   display.removeChildren();
-
-  const tmp = new Container();
-  tmp.orientation = Container.Orientation.Vertical;
-  const lblA = new Label();
-  const lblB = new Label();
-  lblA.text = 'This is a label';
-  lblB.text = 'This is a multi-line label\nthat has centered text.';
-  tmp.addChild(lblA);
-  tmp.addChild(lblB);
-
-  const spacerA = new Widget();
-  spacerA.fixedWidth = 100;
-  const spacerB = new Widget();
-  spacerB.fixedWidth = 100;
-
-  const buttonBar = new Container(null, 'Button Bar');
-  buttonBar.orientation = Container.Orientation.Vertical;
-
-  let row = new Container(buttonBar);
-  Object.keys(Fonts).forEach((font, idx) => {
-    if (idx % 5 === 0) {
-      row = new Container(buttonBar);
-    }
-    const btnFontA = new Button(row);
-    btnFontA.text = font;
-    btnFontA.onMouseClick = () => {
-      lblA.font = Fonts[font];
-      lblB.font = Fonts[font];
-    };
-  });
-
-  const v = new Container();
-  v.orientation = Container.Orientation.Vertical;
-  v.addChild(new Widget());
-  v.addChild(tmp);
-  v.addChild(buttonBar);
-
-  const h = new Container();
-  h.addChild(spacerA);
-  h.addChild(v);
-  h.addChild(spacerA);
-
-  display.addChild(h);
+  const containerScreen = createLabelHelp();
+  display.addChild(containerScreen);
 }));
 
 menu.addChild(makeMenuButton('List', () => {
@@ -315,7 +189,7 @@ menu.addChild(makeMenuButton('List', () => {
 
   const p = new Panel(null, 'test');
   p.setColor(Colors.Indigo);
-  p.setPadding(5, 5, 5, 5);
+  p.padding = 5;
   p.addChild(list);
 
   const h = new Container();
@@ -323,7 +197,7 @@ menu.addChild(makeMenuButton('List', () => {
   h.addChild(new Widget());
   h.addChild(p);
   h.addChild(new Widget());
-  h.setPadding(40, 40, 0, 0);
+  h.padding = [40, 40, 0, 0];
 
   display.addChild(h);
 }));
@@ -345,42 +219,42 @@ menu.addChild(makeMenuButton('Input', () => {
   display.addChild(makeCenter(tmp));
 }));
 
-menu.addChild(makeMenuButton('Modal Dialog', () => {
-  display.removeChildren();
+// menu.addChild(makeMenuButton('Modal Dialog', () => {
+//   display.removeChildren();
 
-  const dialog = new ModalDialog(null, 'test');
-  const c = new Container();
-  c.orientation = Container.Orientation.Vertical;
-  dialog.addChild(c);
+//   const dialog = new ModalDialog(null, 'test');
+//   const c = new Container();
+//   c.orientation = Container.Orientation.Vertical;
+//   dialog.addChild(c);
 
-  const l = new Label();
-  l.text = 'This a a modal dialog box. The context\nof the box are completly user controlled.';
-  // l.backgroundColor = '#aa0000';
-  l.fixedHeight = 140;
-  c.addChild(l);
+//   const l = new Label();
+//   l.text = 'This a a modal dialog box. The context\nof the box are completly user controlled.';
+//   // l.backgroundColor = '#aa0000';
+//   l.fixedHeight = 140;
+//   c.addChild(l);
 
-  const h = new Container();
-  c.addChild(h);
+//   const h = new Container();
+//   c.addChild(h);
 
-  const b = new Button();
-  b.text = 'Close';
-  b.onMouseClick = () => {
-    display.removeChild(dialog);
-  };
+//   const b = new Button();
+//   b.text = 'Close';
+//   b.onMouseClick = () => {
+//     display.removeChild(dialog);
+//   };
 
-  h.addChild(new Container());
-  h.addChild(new Container());
-  h.addChild(b);
+//   h.addChild(new Container());
+//   h.addChild(new Container());
+//   h.addChild(b);
 
-  const tmp = new Button();
-  tmp.text = 'Open ModalDialog';
-  tmp.fixedHeight = 50;
-  tmp.onMouseClick = () => {
-    display.addChild(dialog);
-  };
+//   const tmp = new Button();
+//   tmp.text = 'Open ModalDialog';
+//   tmp.fixedHeight = 50;
+//   tmp.onMouseClick = () => {
+//     display.addChild(dialog);
+//   };
 
-  display.addChild(makeCenter(tmp));
-}));
+//   display.addChild(makeCenter(tmp));
+// }));
 
 const main = async () => {
   while (!global.window.destroyed) {

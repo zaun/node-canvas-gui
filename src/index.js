@@ -10,6 +10,7 @@ import Button from './Button.js';
 import Image from './Image.js';
 import Input from './Input.js';
 import Text from './Text.js';
+import Spinner from './Spinner.js';
 
 Fonts.addFont('Beyond Wonderland', 'Beyond Wonderland.ttf');
 Fonts.addFont('Kenney Blocks', 'Kenney Blocks.ttf');
@@ -30,18 +31,22 @@ Fonts.addFont('Rothenburg Decorative', 'RothenburgDecorative.ttf');
 Fonts.addFont('Black Ops One', 'BlackOpsOne-Regular.ttf');
 Fonts.addFont('Tall Film', 'Tall Film.ttf');
 Fonts.addFont('Sulphur Point', 'SulphurPoint-Regular.ttf');
+Fonts.addFont('Simply Mono Book', 'SimplyMono-Book.ttf');
+Fonts.addFont('Minecart LCD', 'Minecart LCD.ttf');
+Fonts.addFont('PW Small Icons', 'PWSmallIcons.ttf');
 
 export {
-  Widget,
-  Container,
-  ModalDialog,
-  Colors,
-  Fonts,
-  Panel,
-  Label,
-  List,
   Button,
+  Colors,
+  Container,
+  Fonts,
   Image,
   Input,
+  Label,
+  List,
+  ModalDialog,
+  Panel,
+  Spinner,
   Text,
+  Widget,
 };

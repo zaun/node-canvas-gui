@@ -15,6 +15,7 @@
   "main": "src/index.js",
   "scripts": {
     "example": "node example/index.js",
+    "profile": "node --prof example/index.js",
     "lint": "eslint ./src/ ./example/",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config .jestrc.json",
     "coverage": "npm test ; open ./coverage/index.html"
@@ -31,7 +32,7 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.2.1",
-    "@kmamal/sdl": "^0.4.x",
+    "@kmamal/sdl": "^0.6.x",
     "eslint": "^8.26.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",

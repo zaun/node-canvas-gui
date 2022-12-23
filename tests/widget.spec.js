@@ -63,7 +63,7 @@ describe('Testing the base Widget class', () => {
     const widget = new Widget();
     widget.fixedHeight = 20;
     widget.fixedWidth = 20;
-    widget.setPadding(1, 2, 3, 4);
+    widget.padding = [1, 2, 3, 4];
 
     expect(widget.parent).toEqual(null);
     expect(widget.name).toMatch(/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/);
@@ -101,7 +101,7 @@ describe('Testing the base Widget class', () => {
     const root = new Container();
     root.fixedHeight = 20;
     root.fixedWidth = 20;
-    root.setPadding(1, 2, 3, 4);
+    root.padding = [1, 2, 3, 4];
 
     const widget = new Widget(root);
 

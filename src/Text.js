@@ -1,9 +1,9 @@
 import Canvas from 'canvas';
 import crypto from 'crypto';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
-import Container from './Container.js';
+import Widget from './Widget.js';
 
-export default class Text extends Container {
+export default class Text extends Widget {
   #text = '';
   #tokens = [];
   #md = null;
@@ -16,7 +16,7 @@ export default class Text extends Container {
 
   #paraPadding = 5;
   #blockQuoteIndent = 20;
-  #blockQuotePadding = 15;
+  #blockQuotePadding = 5;
   #blockQuoteBarWidth = 12;
   #blockQuoteForeground = '#444444';
   #blockQuoteBackground = '#222222';
@@ -24,14 +24,15 @@ export default class Text extends Container {
   #blockQuoteInfoBackground = '#055060';
   #blockQuoteWarnForeground = '#ffc107';
   #blockQuoteWarnBackground = '#664d02';
-  #listPadding = 10;
+  #listPadding = 5;
   #codeBlockPadding = 15;
 
   #baseFont = 'sans';
   #baseFontSize = 15;
   #baseFontStyle = '';
   #baseFontColor = '#BBBBBB';
-  #baseFontUnderline = '#BBBBBB';
+  #baseFontUnderline = false;
+  #baseFontStrike = false;
 
   #blockQuote = false;
   #blockQuoteStartHeight = 0;
@@ -47,8 +48,16 @@ export default class Text extends Container {
   #codeBlock = false;
   #inlineCode = false;
 
+  #link = false;
+  #linkStartHeight = 0;
+  #linkStartWidth = 0;
+
+  #links = [];
+
   #view;
   #scroll = 0;
+
+  #autoHeight = false;
 
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
@@ -82,6 +91,13 @@ export default class Text extends Container {
       },
       react: () => {},
     };
+    // rules.strike = {
+    //   order: rules.u.order + 0.5,
+    //   match: (source) => /^--((?:\\[\s\S]|[^\\])+?)--(?!_)/.exec(source),
+    //   parse: (capture, parse, state) => ({
+    //     content: SimpleMarkdown.parseInline(parse, capture[1], state),
+    //   }),
+    // };
 
     this.#md = SimpleMarkdown.parserFor(rules);
     this.#view = Canvas.createCanvas(this.body.w, this.body.h);
@@ -91,6 +107,11 @@ export default class Text extends Container {
     }
   }
 
+  set baseFontColor(val) {
+    this.#baseFontColor = val;
+    this._performLayout();
+  }
+
   get text() {
     return this.#text;
   }
@@ -98,8 +119,32 @@ export default class Text extends Container {
   set text(val) {
     this.#text = val.toString();
     this.#tokens = this.#md(`\n\n${this.#text}\n\n`);
-    this.#updateView();
+    this._performLayout();
     // console.log(JSON.stringify(this.#tokens, null, 2));
+  }
+
+  /**
+   * When true automatically set the widget height to the size
+   * of the content. When false widget will be sized by it's
+   * parent.
+   */
+  get autoHeight() {
+    return this.#autoHeight;
+  }
+
+  /**
+   * When true automatically set the widget height to the size
+   * of the content. When false widget will be sized by it's
+   * parent.
+   */
+  set autoHeight(val) {
+    // If changing from fixed to unfixed then clear the
+    // current fixedHeight and update everything.
+    if (this.#autoHeight && !val) {
+      this.fixedHeight = 0;
+    }
+    this.#autoHeight = val;
+    this._performLayout();
   }
 
   get #maxScroll() {
@@ -131,14 +176,23 @@ export default class Text extends Container {
     }
   }
 
+  _performLayout() {
+    this.#updateView();
+    if (this.#autoHeight && this.parent) {
+      this.parent._performLayout();
+    }
+  }
+
   #updateView() {
     this.#currentWidth = 0;
     this.#currentHeight = 0;
     this.#currentLineMaxHeight = 0;
     this.#firstText = true;
+    this.#links = [];
 
     this.#view = Canvas.createCanvas(this.body.w, this.body.h);
     let viewCtx = this.#view.getContext('2d');
+    viewCtx.textBaseline = 'top';
     this.#processTokens(viewCtx, this.#tokens, true);
 
     this.#view = Canvas.createCanvas(this.body.w, this.#currentHeight);
@@ -147,9 +201,17 @@ export default class Text extends Container {
     this.#currentHeight = 0;
     this.#currentLineMaxHeight = 0;
     this.#firstText = true;
+    this.#links = [];
 
     viewCtx = this.#view.getContext('2d');
+    viewCtx.textBaseline = 'top';
+    // console.log('---');
+    // console.log(JSON.stringify(this.#tokens, null, 2));
     this.#processTokens(viewCtx, this.#tokens, false);
+
+    if (this.#autoHeight) {
+      this.fixedHeight = this.#currentHeight;
+    }
   }
 
   #setFont(canvasCtx) {
@@ -187,17 +249,26 @@ export default class Text extends Container {
     canvasCtx.fillStyle = this.#baseFontColor;
     canvasCtx.fillText(text, x, y);
 
+    if (this.#baseFontStrike === true) {
+      canvasCtx.strokeStyle = this.#baseFontColor;
+      canvasCtx.lineWidth = 1;
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(x - 1, y + (hd / 2));
+      canvasCtx.lineTo(x + w + 1, y + (hd / 2));
+      canvasCtx.stroke();
+    }
+
     if (this.#baseFontUnderline === true) {
       canvasCtx.strokeStyle = this.#baseFontColor;
       canvasCtx.lineWidth = 1;
       canvasCtx.beginPath();
-      canvasCtx.moveTo(x, y + 2);
-      canvasCtx.lineTo(x + w, y + 2);
+      canvasCtx.moveTo(x, y + hd);
+      canvasCtx.lineTo(x + w, y + hd);
       canvasCtx.stroke();
     }
   }
 
-  #processTokens(canvasCtx, tokens, doNotDraw = false) {
+  #processTokens(canvasCtx, tokens, doNotDraw = false, depth = 0) {
     tokens.forEach((token) => {
       // Pre token processing
       switch (token.type) {
@@ -216,6 +287,9 @@ export default class Text extends Container {
         case 'u':
           this.#baseFontUnderline = true;
           break;
+        case 'del':
+          this.#baseFontStrike = true;
+          break;
         case 'heading':
           this.#heading = true;
           this.#headingLevel = token.level;
@@ -223,6 +297,9 @@ export default class Text extends Container {
           break;
         case 'blockQuote':
           this.#blockQuote = true;
+          if (!this.#firstText) {
+            this.#currentHeight += this.#paraPadding;
+          }
           this.#blockQuoteStartHeight = this.#currentHeight;
           this.#currentHeight += this.#blockQuotePadding;
           this.#currentWidth = this.#blockQuoteIndent;
@@ -237,7 +314,7 @@ export default class Text extends Container {
               canvasCtx.fillStyle = this.#blockQuoteWarnBackground;
             }
             canvasCtx.fillRect(
-              this.body.x + this.#blockQuoteBarWidth,
+              this.#blockQuoteBarWidth,
               this.#blockQuoteStartHeight,
               this.body.w - this.#blockQuoteBarWidth,
               token.bgSize,
@@ -274,7 +351,14 @@ export default class Text extends Container {
             canvasCtx.stroke();
           }
           break;
+        case 'link':
+          this.#link = true;
+          this.#linkStartHeight = this.#currentHeight;
+          this.#linkStartWidth = this.#currentWidth;
+          break;
         case 'newline':
+          this.#currentHeight += 10;
+          return;
         case 'text':
           break;
         default:
@@ -285,17 +369,12 @@ export default class Text extends Container {
       // Process token content
       if (token.content) {
         if (Array.isArray(token.content)) {
-          this.#processTokens(canvasCtx, token.content, doNotDraw);
+          this.#processTokens(canvasCtx, token.content, doNotDraw, depth + 1);
         } else {
+          this.#firstText = false;
           this.#setFont(canvasCtx);
           const spaceInfo = canvasCtx.measureText(' ');
           const spWidth = spaceInfo.width;
-
-          if (this.#firstText) {
-            const cInfo = canvasCtx.measureText('W');
-            this.#currentHeight = cInfo.emHeightAscent + cInfo.emHeightDescent + 2;
-            this.#firstText = false;
-          }
 
           let str = token.content;
           if (this.#list) {
@@ -314,7 +393,7 @@ export default class Text extends Container {
           if (this.#heading && this.#headingPost) {
             words.push(this.#headingPost);
           }
-          // console.log(2, words);
+
           words.forEach((w, idx) => {
             if (w === '\\n') {
               this.#currentWidth = this.#blockQuote ? this.#blockQuoteIndent : 0;
@@ -324,15 +403,18 @@ export default class Text extends Container {
 
             const wInfo = canvasCtx.measureText(w);
             if (this.#currentWidth + wInfo.width + spWidth < this.body.w) {
-              if (wInfo.emHeightAscent + wInfo.emHeightDescent + 2 > this.#currentLineMaxHeight) {
-                this.#currentLineMaxHeight = wInfo.emHeightAscent + wInfo.emHeightDescent + 2;
+              let wordHeight = Math.abs(wInfo.emHeightAscent);
+              wordHeight += Math.abs(wInfo.emHeightDescent);
+              wordHeight += 2;
+              if (wordHeight > this.#currentLineMaxHeight) {
+                this.#currentLineMaxHeight = wordHeight;
               }
               if (!doNotDraw) {
                 this.#drawText(
                   canvasCtx,
                   w,
-                  this.body.x + this.#currentWidth,
-                  this.body.y + this.#currentHeight,
+                  this.#currentWidth,
+                  this.#currentHeight,
                   idx === words.length - 1 ? wInfo.width : wInfo.width + spWidth,
                   wInfo.emHeightAscent,
                   wInfo.emHeightDescent,
@@ -346,8 +428,8 @@ export default class Text extends Container {
                 this.#drawText(
                   canvasCtx,
                   w,
-                  this.body.x + this.#currentWidth,
-                  this.body.y + this.#currentHeight,
+                  this.#currentWidth,
+                  this.#currentHeight,
                   wInfo.width,
                   wInfo.emHeightAscent,
                   wInfo.emHeightDescent,
@@ -358,8 +440,9 @@ export default class Text extends Container {
         }
       } else if (token.items) {
         token.items.forEach((itemTokens) => {
-          this.#processTokens(canvasCtx, itemTokens, doNotDraw);
+          this.#processTokens(canvasCtx, itemTokens, doNotDraw, depth + 1);
           this.#currentHeight += this.#currentLineMaxHeight;
+          this.#currentLineMaxHeight = 0;
           this.#currentWidth = this.#blockQuote ? this.#blockQuoteIndent : 0;
           if (this.#listCount !== -1) {
             this.#listCount += 1;
@@ -367,10 +450,21 @@ export default class Text extends Container {
         });
       }
 
+      if (
+        token.type !== 'text'
+        && token.type !== 'em'
+        && token.type !== 'strong'
+        && token.type !== 'u'
+        && token.type !== 'del'
+        && token.type !== 'link'
+      ) {
+        this.#currentHeight += this.#currentLineMaxHeight;
+        this.#currentLineMaxHeight = 0;
+      }
+
       // Post token processing
       switch (token.type) {
         case 'paragraph':
-          this.#currentHeight += this.#currentLineMaxHeight;
           this.#currentWidth = this.#blockQuote ? this.#blockQuoteIndent : 0;
           this.#currentHeight += this.#blockQuote ? this.#paraPadding * 2 : this.#paraPadding;
           break;
@@ -383,13 +477,15 @@ export default class Text extends Container {
         case 'u':
           this.#baseFontUnderline = false;
           break;
+        case 'del':
+          this.#baseFontStrike = false;
+          break;
         case 'heading':
-          this.#currentHeight += this.#currentLineMaxHeight;
+          this.#currentHeight += this.#paraPadding;
           this.#currentWidth = 0;
           this.#heading = false;
           break;
         case 'blockQuote':
-          this.#currentHeight += this.#currentLineMaxHeight;
           this.#currentHeight += this.#blockQuotePadding;
 
           // eslint-disable-next-line no-param-reassign
@@ -405,14 +501,14 @@ export default class Text extends Container {
               canvasCtx.fillStyle = this.#blockQuoteWarnForeground;
             }
             canvasCtx.fillRect(
-              this.body.x,
+              0,
               this.#blockQuoteStartHeight,
               this.#blockQuoteBarWidth,
-              this.#currentHeight - this.#blockQuoteStartHeight,
+              token.bgSize,
             );
           }
 
-          this.#currentHeight += this.#paraPadding * 2;
+          this.#currentHeight += this.#paraPadding;
           this.#currentWidth = 0;
           this.#blockQuote = false;
           break;
@@ -423,7 +519,6 @@ export default class Text extends Container {
           this.#currentWidth = 0;
           break;
         case 'codeBlock':
-          this.#currentHeight += this.#currentLineMaxHeight;
           this.#currentWidth = 0;
           this.#codeBlock = false;
           this.#currentHeight += this.#codeBlockPadding;
@@ -435,10 +530,22 @@ export default class Text extends Container {
           this.#currentHeight += this.#paraPadding;
           this.#currentWidth = 0;
           break;
+        case 'link':
+          this.#link = true;
+          this.#links.push({
+            x: this.#linkStartWidth,
+            y: this.#linkStartHeight,
+            h: this.#currentHeight - this.#linkStartHeight,
+            w: this.#currentWidth - this.#linkStartWidth,
+            target: token.target,
+          });
+          break;
         case 'newline':
           if (!this.#firstText) {
             this.#currentHeight += 5;
           }
+          break;
+        case 'text':
           break;
         default:
           break;

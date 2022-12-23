@@ -56,6 +56,22 @@ export default class Panel extends Container {
     return this.#mode;
   }
 
+  set radii(val) {
+    const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
+
+    if (!Number.isNaN(Number(val))) {
+      this.#radii = [val, val, val, val];
+    } else if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
+      this.#radii = val;
+    } else {
+      throw Error('Panel radii must be a number or an array of four numbers');
+    }
+  }
+
+  get radii() {
+    return this.#radii;
+  }
+
   setColor(val) {
     this.#bgColor = val;
     this.#borderColor = Colors.darker(val);
@@ -73,8 +89,8 @@ export default class Panel extends Container {
     canvasCtx.strokeStyle = this.#borderColor;
 
     canvasCtx.roundRect(
-      this.container.x + (canvasCtx.lineWidth / 2),
-      this.container.y + (canvasCtx.lineWidth / 2),
+      this.container.x + Math.floor(canvasCtx.lineWidth / 2),
+      this.container.y + Math.floor(canvasCtx.lineWidth / 2),
       this.container.w - canvasCtx.lineWidth,
       this.container.h - canvasCtx.lineWidth,
       this.#radii,

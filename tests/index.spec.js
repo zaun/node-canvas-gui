@@ -9,8 +9,8 @@ describe('Testing the module', () => {
   test('should have all the widgets', async () => {
     const files = await fs.readdir('./src/');
 
-    // Remove index.js and EventSource.js from the count
-    const widgetCount = files.length - 2;
+    // Remove index.js Internal.js and EventSource.js from the count
+    const widgetCount = files.length - 3;
 
     expect(Object.keys(gui).filter(
       (v) => v[0] === v[0].toLocaleUpperCase(),

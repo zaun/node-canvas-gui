@@ -3,8 +3,8 @@ export default class EventSource {
 
   get eventSource() {
     if (this._eventSource === null) {
-      if (this._parent !== null) {
-        return this._parent.eventSource;
+      if (this.parent !== null) {
+        return this.parent.eventSource;
       }
       return null;
     }
@@ -14,7 +14,7 @@ export default class EventSource {
   set eventSource(val) {
     this._eventSource = val;
 
-    if (val.native) {
+    if (typeof val._native !== 'undefined') {
       this.#setupSDLEvents();
     } else {
       this._eventSource = null;

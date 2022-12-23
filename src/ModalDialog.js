@@ -14,21 +14,19 @@ export default class ModalDialog extends Container {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this._absolutePosition = true;
+    this.fixedSize = true;
 
     this.#modalRoot.setContainer(0, 0, global.window.width, global.window.height);
-    this.#modalRoot.backgroundColor = '#00000088';
     this.#modalRoot.addChild(new Widget());
     this.#modalCenter.orientation = Container.Orientation.Vertical;
     this.#modalRoot.addChild(this.#modalCenter);
     this.#modalRoot.addChild(new Widget());
-    this.#modalRoot._absolutePosition = true;
 
     this.#modalCenter.addChild(new Widget());
     this.#modalCenter.addChild(this.#modalBody);
     this.#modalCenter.addChild(new Widget());
 
-    this.#modalBody.setPadding(25, 25, 25, 25);
+    this.#modalBody.padding = [25, 25, 25, 25];
 
     this.#modalRoot.onMouseClick = () => true;
     this.onMouseClick = () => true;
@@ -58,12 +56,12 @@ export default class ModalDialog extends Container {
     this.#modalBody.onMouseClick = val;
   }
 
-  addChild(child) {
-    this.#modalBody.addChild(child);
+  set padding(val) {
+    this.#modalBody.padding = val;
   }
 
-  setPadding(top, bottom, left, right) {
-    this.#modalBody.setPadding(top, bottom, left, right);
+  addChild(child) {
+    this.#modalBody.addChild(child);
   }
 
   _eventMouseMove(event) {

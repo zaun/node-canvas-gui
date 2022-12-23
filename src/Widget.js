@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { AutoNumber, PositiveNumber } from './Internal.js';
 import EventSource from './EventSource.js';
 
 export default class Widget extends EventSource {
@@ -13,8 +14,9 @@ export default class Widget extends EventSource {
   }
 
   #name = '';
+  #parent = null;
+
   #visible = true;
-  #backgroundColor = '#00000000';
   #borderColor = '#000000';
 
   #fixedWidth = 0;
@@ -34,12 +36,14 @@ export default class Widget extends EventSource {
     h: 0,
   };
 
+  #order = 0;
+  #grow = 1;
+
   // extended classes need access to these.
-  _indent = 0; // indent for body that is not use controlled. Set by widget based
-  _absolutePosition = false;
-  _parent = null;
+
   _mousePosX = 0;
   _mousePosY = 0;
+
   _mouseHover = false;
   _mouseDown = false;
   _mouseClick = false;
@@ -68,37 +72,32 @@ export default class Widget extends EventSource {
     }
   }
 
-  get body() {
-    let x = this.container.x + this.#padding.l + this._indent;
-    if (x < 0) {
-      x = 0;
-    }
-    let y = this.container.y + this.#padding.t + this._indent;
-    if (y < 0) {
-      y = 0;
-    }
-    let w = this.container.w - this.#padding.l - this.#padding.r - this._indent - this._indent;
-    if (w < 0) {
-      w = 0;
-    }
-    let h = this.container.h - this.#padding.t - this.#padding.b - this._indent - this._indent;
-    if (h < 0) {
-      h = 0;
-    }
-    return {
-      x, y, w, h,
-    };
-  }
+  set padding(val) {
+    const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
 
-  get container() {
-    const w = this.#fixedWidth === 0 ? this.#container.w : this.fixedWidth;
-    const h = this.#fixedHeight === 0 ? this.#container.h : this.fixedHeight;
-    return {
-      x: this.#container.x,
-      y: this.#container.y,
-      w,
-      h,
-    };
+    if (!Number.isNaN(Number(val))) {
+      this.#padding = {
+        t: val,
+        b: val,
+        l: val,
+        r: val,
+      };
+    } else if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
+      this.#padding = {
+        t: val[0],
+        b: val[1],
+        l: val[2],
+        r: val[3],
+      };
+    } else {
+      throw Error('Panel radii must be a number or an array of four numbers');
+    }
+
+    if (this.#parent) {
+      this.#parent._performLayout();
+    } else {
+      this._performLayout();
+    }
   }
 
   get padding() {
@@ -121,24 +120,6 @@ export default class Widget extends EventSource {
     return this.#visible;
   }
 
-  get backgroundColor() {
-    return this.#backgroundColor;
-  }
-
-  set backgroundColor(val) {
-    let color = val;
-    if (color[0] !== '#') {
-      return;
-    }
-    if (color.length !== 7 && color.length !== 9) {
-      return;
-    }
-    if (color.length === 7) {
-      color += 'FF';
-    }
-    this.#backgroundColor = color;
-  }
-
   get borderColor() {
     return this.#borderColor;
   }
@@ -154,50 +135,197 @@ export default class Widget extends EventSource {
     this.#borderColor = color;
   }
 
+  get parent() {
+    return this.#parent;
+  }
+
+  set parent(val) {
+    if (val !== null && !val.addChild) {
+      throw Error('Parent must be a Container or null.');
+    }
+
+    if (val === null) {
+      this.#parent = null;
+      this.#parent.removeChild(this);
+    } else if (this.#parent === null || this.#parent.name !== val.name) {
+      this.#parent = val;
+      val.addChild(this);
+    }
+
+    if (this.#parent && this.#parent._performLayout) {
+      this.#parent._performLayout();
+    }
+  }
+
+  // #region Position and Size
+
+  /**
+   * The area of the widget that its contents are displayed. This is the
+   * container minus the padding.
+   */
+  get body() {
+    let x = this.container.x + this.#padding.l;
+    if (x < 0) {
+      x = 0;
+    }
+    let y = this.container.y + this.#padding.t;
+    if (y < 0) {
+      y = 0;
+    }
+    let w = this.container.w - this.#padding.l - this.#padding.r;
+    if (w < 0) {
+      w = 0;
+    }
+    let h = this.container.h - this.#padding.t - this.#padding.b;
+    if (h < 0) {
+      h = 0;
+    }
+    return {
+      x, y, w, h,
+    };
+  }
+
+  /**
+   * Location on screen of the widget.
+   */
+  get container() {
+    const w = this.fixedWidth === 0 ? this.#container.w : this.fixedWidth;
+    const h = this.fixedHeight === 0 ? this.#container.h : this.fixedHeight;
+    return {
+      x: this.#container.x,
+      y: this.#container.y,
+      w,
+      h,
+    };
+  }
+
+  get position() {
+    return {
+      x: this.#container.x,
+      y: this.#container.y,
+    };
+  }
+
+  set position({ x, y }) {
+    this.#container.x = new PositiveNumber(x);
+    this.#container.y = new PositiveNumber(y);
+  }
+
+  get size() {
+    return {
+      width: this.#container.w,
+      height: this.#container.h,
+    };
+  }
+
+  set size({ width, height }) {
+    this.#container.w = new AutoNumber(width);
+    this.#container.h = new AutoNumber(height);
+    this._performLayout();
+  }
+
+  /**
+   * If set this is the height of the widget. The widget will
+   * not grow or shrink based on its container. If the widget
+   * is larger than its container it will be clipped to fit in
+   * the container
+   */
   get fixedHeight() {
+    if (this.#fixedHeight instanceof Widget) {
+      return this.#fixedHeight.container.h;
+    }
     return this.#fixedHeight;
   }
 
+  /**
+   * If set this is the height of the widget. The widget will
+   * not grow or shrink based on its container. If the widget
+   * is larger than its container it will be clipped to fit in
+   * the container
+   */
   set fixedHeight(val) {
-    if (val < 0) {
-      throw Error('Widget \'fixedHeight\' must be greater to or equal to 0.');
+    if (!Number.isNaN(Number(val)) && val < 0) {
+      throw Error('Value number be a number greater than 0 or a Widget.');
+    } else if (Number.isNaN(Number(val)) && !(val instanceof Widget)) {
+      throw Error('Value number be a number greater than 0 or a Widget.');
     }
 
     if (this.#fixedHeight !== val) {
       this.#fixedHeight = val;
-      if (this._parent) {
-        this._parent._performLayout();
+      if (this.#parent) {
+        this.#parent._performLayout();
       }
     }
   }
 
   get fixedWidth() {
+    if (this.#fixedWidth instanceof Widget) {
+      return this.#fixedWidth.container.h;
+    }
     return this.#fixedWidth;
   }
 
   set fixedWidth(val) {
-    if (val < 0) {
-      throw Error('Widget \'fixedWidth\' must be greater to or equal to 0.');
+    if (!Number.isNaN(Number(val)) && val < 0) {
+      throw Error('Value number be a number greater than 0 or a Widget.');
+    } else if (Number.isNaN(Number(val)) && !(val instanceof Widget)) {
+      throw Error('Value number be a number greater than 0 or a Widget.');
     }
 
     if (this.#fixedWidth !== val) {
       this.#fixedWidth = val;
-      if (this._parent) {
-        this._parent._performLayout();
+      if (this.#parent) {
+        this.#parent._performLayout();
       }
     }
   }
 
-  get parent() {
-    return this._parent;
+  /**
+   * If all items have in a container have grow set to 1, the remaining space in the container
+   * will be distributed equally to all children. If one of the children has a value of 2, that
+   * child would take up twice as much of the space either one of the others.
+   * @type {number}
+   */
+  get grow() {
+    return this.#grow;
   }
 
-  set parent(val) {
-    this._parent = val;
-    if (this._parent && this._parent._performLayout) {
-      this._parent._performLayout();
+  /**
+   * If all items have in a container have grow set to 1, the remaining space in the container
+   * will be distributed equally to all children. If one of the children has a value of 2, that
+   * child would take up twice as much of the space either one of the others.
+   * @type {number}
+   */
+  set grow(val) {
+    if (val < 1) {
+      throw Error('Invalid widget grow value.');
     }
+    this.#grow = val;
   }
+
+  /**
+   * By default, items are laid out in the source order. However, the order property controls the
+   * order in which they appear in a container.
+   * @type {number}
+   */
+  get order() {
+    return this.#order;
+  }
+
+  /**
+   * By default, items are laid out in the source order. However, the order property controls the
+   * order in which they appear in a container.
+   * @type {number}
+   */
+  set order(val) {
+    if (val < 0) {
+      throw Error('Invalid widget order value.');
+    }
+    this.#order = val;
+  }
+
+  // #endregion Position
+  // #region Events
 
   set onMouseClick(val) {
     this._onMouseClick = null;
@@ -206,14 +334,16 @@ export default class Widget extends EventSource {
     }
   }
 
+  // #endregion
+
   _eventMouseMove(event) {
     this._mousePosX = event.x;
     this._mousePosY = event.y;
     if (
-      this._mousePosX > this.#container.x
-      && this._mousePosX < this.#container.x + this.#container.w
-      && this._mousePosY > this.#container.y
-      && this._mousePosY < this.#container.y + this.#container.h
+      this._mousePosX > this.container.x
+      && this._mousePosX < this.container.x + this.container.w
+      && this._mousePosY > this.container.y
+      && this._mousePosY < this.container.y + this.container.h
     ) {
       this._mouseHover = true;
     } else {
@@ -223,10 +353,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonDown() {
     if (
-      this._mousePosX > this.#container.x
-      && this._mousePosX < this.#container.x + this.#container.w
-      && this._mousePosY > this.#container.y
-      && this._mousePosY < this.#container.y + this.#container.h
+      this._mousePosX > this.container.x
+      && this._mousePosX < this.container.x + this.container.w
+      && this._mousePosY > this.container.y
+      && this._mousePosY < this.container.y + this.container.h
     ) {
       this._mouseDown = true;
     } else {
@@ -237,10 +367,10 @@ export default class Widget extends EventSource {
 
   _eventMouseButtonUp() {
     if (
-      this._mousePosX > this.#container.x
-      && this._mousePosX < this.#container.x + this.#container.w
-      && this._mousePosY > this.#container.y
-      && this._mousePosY < this.#container.y + this.#container.h
+      this._mousePosX > this.container.x
+      && this._mousePosX < this.container.x + this.container.w
+      && this._mousePosY > this.container.y
+      && this._mousePosY < this.container.y + this.container.h
     ) {
       this._mouseClick = true;
     }
@@ -282,34 +412,6 @@ export default class Widget extends EventSource {
     }
   }
 
-  setPadding(top, bottom, left, right) {
-    if (top < 0) {
-      throw Error('Padding \'top\' location must be greater to or equal to 0.');
-    }
-    if (bottom < 0) {
-      throw Error('Padding \'bottom\' location must be greater to or equal to 0.');
-    }
-    if (left < 0) {
-      throw Error('Padding \'left\' location must be greater to or equal to 0.');
-    }
-    if (right < 0) {
-      throw Error('Padding \'right\' location must be greater to or equal to 0.');
-    }
-
-    this.#padding = {
-      t: top,
-      b: bottom,
-      l: left,
-      r: right,
-    };
-
-    if (this._parent) {
-      this._parent._performLayout();
-    } else {
-      this._performLayout();
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   _performLayout() { }
 
@@ -321,30 +423,17 @@ export default class Widget extends EventSource {
     console.log(`${'   '.repeat(depth)}${this.constructor.name} ${this.name} ${JSON.stringify(this.container)}`);
   }
 
-  _preDraw(canvasCtx) {
+  _preDraw() {
     if (this._mouseClick && this._onMouseClick !== null) {
       if (this._onMouseClick() === true) {
-        let p = this._parent;
+        let p = this.#parent;
         while (p !== null) {
           p._mouseClick = false;
-          p = p._parent;
+          p = p.#parent;
         }
       }
     }
     this._mouseClick = false;
-
-    const alpha = this.#backgroundColor.slice(-2);
-    if (alpha !== '00') {
-      canvasCtx.save();
-      canvasCtx.fillStyle = this.#backgroundColor;
-      canvasCtx.fillRect(
-        this.#container.x,
-        this.#container.y,
-        this.#container.w,
-        this.#container.h,
-      );
-      canvasCtx.restore();
-    }
   }
 
   _draw(canvasCtx, depth) {
@@ -355,12 +444,10 @@ export default class Widget extends EventSource {
 
   // eslint-disable-next-line class-methods-use-this
   _postDraw() {
-    // canvasCtx.save();
     // canvasCtx.beginPath();
     // canvasCtx.strokeStyle = this.#borderColor;
-    // canvasCtx.rect(this.#container.x, this.#container.y, this.#container.w, this.#container.h);
+    // canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
     // canvasCtx.stroke();
-    // canvasCtx.restore();
   }
 
   draw(canvasCtx, depth = 0) {
