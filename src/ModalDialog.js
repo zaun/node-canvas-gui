@@ -16,7 +16,7 @@ export default class ModalDialog extends Container {
 
     this.fixedSize = true;
 
-    this.#modalRoot.setContainer(0, 0, global.window.width, global.window.height);
+    this.#modalRoot.container = [0, 0, global.window.width, global.window.height];
     this.#modalRoot.addChild(new Widget());
     this.#modalCenter.orientation = Container.Orientation.Vertical;
     this.#modalRoot.addChild(this.#modalCenter);

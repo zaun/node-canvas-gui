@@ -81,7 +81,7 @@ const makeCenter = (widget) => {
 const root = new Container(null, 'Root');
 root.orientation = Container.Orientation.Horizontal;
 root.eventSource = global.window;
-root.setContainer(0, 0, global.window.width, global.window.height);
+root.container = [0, 0, global.window.width, global.window.height];
 
 // Add a Container for menu
 const menu = new Container(root, 'Menu');

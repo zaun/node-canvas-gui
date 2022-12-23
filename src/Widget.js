@@ -1,9 +1,9 @@
 import crypto from 'crypto';
-import { AutoNumber, PositiveNumber } from './Internal.js';
 import EventSource from './EventSource.js';
 
 export default class Widget extends EventSource {
   static #debug = false;
+  static #testing = false;
 
   static get debug() {
     return Widget.#debug;
@@ -11,6 +11,14 @@ export default class Widget extends EventSource {
 
   static set debug(val) {
     Widget.#debug = val === true;
+  }
+
+  static get testing() {
+    return Widget.#testing;
+  }
+
+  static set testing(val) {
+    Widget.#testing = val === true;
   }
 
   #name = '';
@@ -49,13 +57,6 @@ export default class Widget extends EventSource {
   _mouseClick = false;
   _onMouseClick = null;
 
-  _tint = {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 0,
-  };
-
   constructor(parent = null, name = crypto.randomUUID()) {
     super();
 
@@ -67,7 +68,7 @@ export default class Widget extends EventSource {
       throw new Error(`Parent widget type must be a Container but got: ${parent.constructor}`);
     }
 
-    if (new.target === Widget) {
+    if (new.target === Widget && !Widget.testing) {
       Object.preventExtensions(this);
     }
   }
@@ -90,7 +91,7 @@ export default class Widget extends EventSource {
         r: val[3],
       };
     } else {
-      throw Error('Panel radii must be a number or an array of four numbers');
+      throw Error('Widget padding must be a number or an array of four numbers');
     }
 
     if (this.#parent) {
@@ -140,20 +141,17 @@ export default class Widget extends EventSource {
   }
 
   set parent(val) {
+    // can't use instanceof here as it would cause a dependancy cycle
     if (val !== null && !val.addChild) {
       throw Error('Parent must be a Container or null.');
     }
 
     if (val === null) {
-      this.#parent = null;
       this.#parent.removeChild(this);
+      this.#parent = null;
     } else if (this.#parent === null || this.#parent.name !== val.name) {
       this.#parent = val;
       val.addChild(this);
-    }
-
-    if (this.#parent && this.#parent._performLayout) {
-      this.#parent._performLayout();
     }
   }
 
@@ -164,14 +162,8 @@ export default class Widget extends EventSource {
    * container minus the padding.
    */
   get body() {
-    let x = this.container.x + this.#padding.l;
-    if (x < 0) {
-      x = 0;
-    }
-    let y = this.container.y + this.#padding.t;
-    if (y < 0) {
-      y = 0;
-    }
+    const x = this.container.x + this.#padding.l;
+    const y = this.container.y + this.#padding.t;
     let w = this.container.w - this.#padding.l - this.#padding.r;
     if (w < 0) {
       w = 0;
@@ -188,6 +180,31 @@ export default class Widget extends EventSource {
   /**
    * Location on screen of the widget.
    */
+
+  set container(val) {
+    const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
+
+    if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
+      if (
+        this.#container.x !== val[0]
+        || this.#container.y !== val[1]
+        || this.#container.w !== val[2]
+        || this.#container.h !== val[3]
+      ) {
+        this.#container = {
+          x: val[0],
+          y: val[1],
+          w: val[2],
+          h: val[3],
+        };
+
+        this._performLayout();
+      }
+    } else {
+      throw Error('Widget container must be an array of four numbers');
+    }
+  }
+
   get container() {
     const w = this.fixedWidth === 0 ? this.#container.w : this.fixedWidth;
     const h = this.fixedHeight === 0 ? this.#container.h : this.fixedHeight;
@@ -197,31 +214,6 @@ export default class Widget extends EventSource {
       w,
       h,
     };
-  }
-
-  get position() {
-    return {
-      x: this.#container.x,
-      y: this.#container.y,
-    };
-  }
-
-  set position({ x, y }) {
-    this.#container.x = new PositiveNumber(x);
-    this.#container.y = new PositiveNumber(y);
-  }
-
-  get size() {
-    return {
-      width: this.#container.w,
-      height: this.#container.h,
-    };
-  }
-
-  set size({ width, height }) {
-    this.#container.w = new AutoNumber(width);
-    this.#container.h = new AutoNumber(height);
-    this._performLayout();
   }
 
   /**
@@ -254,13 +246,15 @@ export default class Widget extends EventSource {
       this.#fixedHeight = val;
       if (this.#parent) {
         this.#parent._performLayout();
+      } else {
+        this._performLayout();
       }
     }
   }
 
   get fixedWidth() {
     if (this.#fixedWidth instanceof Widget) {
-      return this.#fixedWidth.container.h;
+      return this.#fixedWidth.container.w;
     }
     return this.#fixedWidth;
   }
@@ -276,6 +270,8 @@ export default class Widget extends EventSource {
       this.#fixedWidth = val;
       if (this.#parent) {
         this.#parent._performLayout();
+      } else {
+        this._performLayout();
       }
     }
   }
@@ -383,34 +379,6 @@ export default class Widget extends EventSource {
 
   // eslint-disable-next-line class-methods-use-this
   _eventMouseWheel() {}
-
-  setContainer(x, y, width, height) {
-    if (x < 0) {
-      throw Error('Container \'x\' location must be greater to or equal to 0.');
-    }
-    if (y < 0) {
-      throw Error('Container \'y\' location must be greater to or equal to 0.');
-    }
-    if (width < 0) {
-      throw Error('Container \'width\' location must be greater to or equal to 0.');
-    }
-    if (height < 0) {
-      throw Error('Container \'height\' location must be greater to or equal to 0.');
-    }
-
-    if (
-      this.#container.x !== x
-      || this.#container.y !== y
-      || this.#container.w !== width
-      || this.#container.h !== height
-    ) {
-      this.#container.x = x;
-      this.#container.y = y;
-      this.#container.w = width;
-      this.#container.h = height;
-      this._performLayout();
-    }
-  }
 
   // eslint-disable-next-line class-methods-use-this
   _performLayout() { }

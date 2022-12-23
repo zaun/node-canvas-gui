@@ -92,7 +92,7 @@ export default class List extends Widget {
 
     this.#items.forEach((i, idx) => {
       const w = this.#itemCreate(i);
-      w.setContainer(0, idx * this.#itemHeight, this.body.w, this.#itemHeight);
+      w.container = [0, idx * this.#itemHeight, this.body.w, this.#itemHeight];
       w.draw(viewCtx);
       this.#itemWidgets.push(w);
     });

@@ -42,7 +42,7 @@ export default class Container extends Widget {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    if (new.target === Container) {
+    if (new.target === Container && !Widget.testing) {
       Object.preventExtensions(this);
     }
   }
@@ -106,8 +106,6 @@ export default class Container extends Widget {
   }
 
   _performLayout() {
-    super._performLayout();
-
     let totalSpacing = 0;
     let childWidth = 0;
     let childHeight = 0;
@@ -191,7 +189,8 @@ export default class Container extends Widget {
           }
 
           const newWidth = w.fixedWidth === 0 ? w.grow * childWidth : w.fixedWidth;
-          w.setContainer.call(w, x + offset, y, newWidth, childHeight);
+          // eslint-disable-next-line no-param-reassign
+          w.container = [x + offset, y, newWidth, childHeight];
           offset += newWidth + this.#spacing;
         });
         break;
@@ -250,10 +249,12 @@ export default class Container extends Widget {
 
           if (w.fixedHeight === 0) {
             const newHeight = w.grow * childHeight;
-            w.setContainer(x, y + offset, childWidth, newHeight);
+            // eslint-disable-next-line no-param-reassign
+            w.container = [x, y + offset, childWidth, newHeight];
             offset += newHeight + this.#spacing;
           } else {
-            w.setContainer(x, y + offset, childWidth, w.fixedHeight);
+            // eslint-disable-next-line no-param-reassign
+            w.container = [x, y + offset, childWidth, w.fixedHeight];
             offset += w.fixedHeight + this.#spacing;
           }
         });
