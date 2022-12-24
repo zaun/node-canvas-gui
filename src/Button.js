@@ -3,7 +3,12 @@ import crypto from 'crypto';
 import Colors from './Colors.js';
 import Widget from './Widget.js';
 
-export default class Button extends Widget {
+/**
+ * The Button widget is generally used to trigger a callback function that is
+ * called when the button is pressed.
+ * @extends Widget
+ */
+class Button extends Widget {
   static Mode = {
     Default: 'Default',
     Outline: 'Outline',
@@ -35,6 +40,11 @@ export default class Button extends Widget {
   #hoverBorderColor = '';
   #view = null;
 
+  /**
+   * Create a new Button.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -262,3 +272,5 @@ export default class Button extends Widget {
     super._draw(canvasCtx, depth);
   }
 }
+
+export default Button;

@@ -3,7 +3,13 @@ import crypto from 'crypto';
 import SimpleMarkdown from '@khanacademy/simple-markdown';
 import Widget from './Widget.js';
 
-export default class Text extends Widget {
+/**
+ * Make text display with support for markdown. By default the text will scroll
+ * in thr provided space, alternativly the widget can change its height based
+ * on the content to it does not scroll.
+ * @extends Widget
+ */
+class Text extends Widget {
   #text = '';
   #tokens = [];
   #md = null;
@@ -59,6 +65,11 @@ export default class Text extends Widget {
 
   #autoHeight = false;
 
+  /**
+   * Create a new Text.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -573,3 +584,5 @@ export default class Text extends Widget {
     super._draw(canvasCtx, depth);
   }
 }
+
+export default Text;

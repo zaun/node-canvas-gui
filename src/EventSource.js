@@ -1,4 +1,9 @@
-export default class EventSource {
+/**
+ * The base object of all Widgets. This handles incoming events
+ * from the system (node-sdl) and propigates them out to the
+ * widget tree.
+ */
+class EventSource {
   _eventSource = null;
 
   get eventSource() {
@@ -68,3 +73,5 @@ export default class EventSource {
     });
   }
 }
+
+export default EventSource;

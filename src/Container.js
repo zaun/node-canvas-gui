@@ -1,7 +1,15 @@
 import crypto from 'crypto';
 import Widget from './Widget.js';
 
-export default class Container extends Widget {
+/**
+ * A canvas-gui user interface is constructed by nesting widgets inside widgets. Container
+ * widgets are the inner nodes in the resulting tree of widgets: they contain other widgets.
+ * So, for example, you might have a Container containing a Panel containing a Label. If you
+ * wanted an image instead of a textual label inside the Panel, you might replace the Label
+ * widget with a Image widget.
+ * @extends Widget
+ */
+class Container extends Widget {
   static #Orientation = {
     Horizontal: 0,
     Vertical: 1,
@@ -39,6 +47,11 @@ export default class Container extends Widget {
   #alignItems = Container.AlignItems.Center;
   #justifyItems = Container.JustifyItems.Start;
 
+  /**
+   * Create a new Container.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -383,3 +396,5 @@ export default class Container extends Widget {
     });
   }
 }
+
+export default Container;

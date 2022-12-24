@@ -2,7 +2,11 @@ import Canvas from 'canvas';
 import crypto from 'crypto';
 import Widget from './Widget.js';
 
-export default class List extends Widget {
+/**
+ * A List is a vertical container that contains Widget children.
+ * @extends Widget
+ */
+class List extends Widget {
   #items = [];
   #itemHeight = 1;
   #itemWidgets = [];
@@ -12,6 +16,11 @@ export default class List extends Widget {
   #view = null;
   #scroll = 0;
 
+  /**
+   * Create a new List.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -122,3 +131,5 @@ export default class List extends Widget {
     super._draw(canvasCtx, depth);
   }
 }
+
+export default List;

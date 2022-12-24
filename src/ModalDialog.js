@@ -5,12 +5,16 @@ import Panel from './Panel.js';
 
 // Force a fullscreen dialog that will prevent
 // mouse clicks from propigating to items below it.
-
-export default class ModalDialog extends Container {
+class ModalDialog extends Container {
   #modalRoot = new Container(null, 'ModalDialog Root');
   #modalCenter = new Container();
   #modalBody = new Panel(null, 'ModalDialog Body');
 
+  /**
+   * Create a new Widget.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -95,3 +99,5 @@ export default class ModalDialog extends Container {
     }
   }
 }
+
+export default ModalDialog;

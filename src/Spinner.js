@@ -1,7 +1,12 @@
 import crypto from 'crypto';
 import Widget from './Widget.js';
 
-export default class Spinner extends Widget {
+class Spinner extends Widget {
+  /**
+   * Create a new Spinner.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -18,3 +23,5 @@ export default class Spinner extends Widget {
     super._draw(canvasCtx, depth);
   }
 }
+
+export default Spinner;

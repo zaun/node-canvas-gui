@@ -2,7 +2,12 @@ import crypto from 'crypto';
 import Container from './Container.js';
 import Colors from './Colors.js';
 
-export default class Panel extends Container {
+/**
+ * The Panel widget is a bin that surrounds its child with a decorative frame
+ * and backround.
+ * @extends Container
+ */
+class Panel extends Container {
   static Mode = {
     Default: 'Default',
     Outline: 'Outline',
@@ -14,6 +19,11 @@ export default class Panel extends Container {
   #borderWidth = 4;
   #radii = [8, 8, 8, 8];
 
+  /**
+   * Create a new Panel.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -107,3 +117,5 @@ export default class Panel extends Container {
     super._draw(canvasCtx, depth);
   }
 }
+
+export default Panel;

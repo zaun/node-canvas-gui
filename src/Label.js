@@ -3,7 +3,11 @@ import crypto from 'crypto';
 import Colors from './Colors.js';
 import Widget from './Widget.js';
 
-export default class Label extends Widget {
+/**
+ * The Label widget displays a small amount of text.
+ * @extends Widget
+ */
+class Label extends Widget {
   static #Justify = {
     Left: 0,
     Center: 1,
@@ -21,6 +25,11 @@ export default class Label extends Widget {
   #view = null;
   #justify = Label.Justify.Center;
 
+  /**
+   * Create a new Label.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -126,3 +135,5 @@ export default class Label extends Widget {
     // canvasCtx.strokeRect(this.body.x, this.body.y, this.body.w, this.body.h);
   }
 }
+
+export default Label;

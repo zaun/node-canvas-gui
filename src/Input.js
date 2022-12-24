@@ -3,7 +3,13 @@ import crypto from 'crypto';
 import Colors from './Colors.js';
 import Widget from './Widget.js';
 
-export default class Input extends Widget {
+/**
+ * The Input widget is a single line text entry widget. If the entered text is
+ * longer than the allocation of the widget, the widget will scroll so that
+ * the cursor position is visible.
+ * @extends Widget
+ */
+class Input extends Widget {
   static Size = {
     Large: 'Large',
     Medium: 'Medium',
@@ -40,6 +46,11 @@ export default class Input extends Widget {
   _view = null;
   _cursorPos = 0;
 
+  /**
+   * Create a new Input.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -265,3 +276,5 @@ export default class Input extends Widget {
     }
   }
 }
+
+export default Input;

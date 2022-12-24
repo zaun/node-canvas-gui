@@ -1,7 +1,12 @@
 import crypto from 'crypto';
 import EventSource from './EventSource.js';
 
-export default class Widget extends EventSource {
+/**
+ * Widget is the base class all widgets in cangas-gui derive from. It manages
+ * the widget lifecycle and states.
+ * @extends EventSource
+ */
+class Widget extends EventSource {
   static #debug = false;
   static #testing = false;
 
@@ -56,6 +61,11 @@ export default class Widget extends EventSource {
   _mouseClick = false;
   _onMouseClick = null;
 
+  /**
+   * Create a new Widget.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super();
 
@@ -72,6 +82,16 @@ export default class Widget extends EventSource {
     }
   }
 
+  get padding() {
+    return this.#padding;
+  }
+
+  /**
+   * Set a widgets padding. If a number than all four sides are set to
+   * that value. If an array or four numbers then the Top, Bottom, Left
+   * and Right padding will be set independantly.
+   * @type {Number|Array}
+   */
   set padding(val) {
     const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
 
@@ -98,10 +118,6 @@ export default class Widget extends EventSource {
     } else {
       this._performLayout();
     }
-  }
-
-  get padding() {
-    return this.#padding;
   }
 
   get mouseClick() {
@@ -169,6 +185,12 @@ export default class Widget extends EventSource {
    * Location on screen of the widget.
    */
 
+  /**
+   * Set a widgets container. Sets the top, left,
+   * width and height of the widget. Generally this only needs
+   * manually set on the root widget of your display.
+   * @type {Array}
+   */
   set container(val) {
     const onlyNumbers = (a) => a.every((i) => typeof i === 'number');
 
@@ -204,12 +226,6 @@ export default class Widget extends EventSource {
     };
   }
 
-  /**
-   * If set this is the height of the widget. The widget will
-   * not grow or shrink based on its container. If the widget
-   * is larger than its container it will be clipped to fit in
-   * the container
-   */
   get fixedHeight() {
     if (this.#fixedHeight instanceof Widget) {
       return this.#fixedHeight.container.h;
@@ -222,6 +238,7 @@ export default class Widget extends EventSource {
    * not grow or shrink based on its container. If the widget
    * is larger than its container it will be clipped to fit in
    * the container
+   * @type {Number}
    */
   set fixedHeight(val) {
     if (!Number.isNaN(Number(val)) && val < 0) {
@@ -247,6 +264,13 @@ export default class Widget extends EventSource {
     return this.#fixedWidth;
   }
 
+  /**
+   * If set this is the width of the widget. The widget will
+   * not grow or shrink based on its container. If the widget
+   * is larger than its container it will be clipped to fit in
+   * the container
+   * @type {Number}
+   */
   set fixedWidth(val) {
     if (!Number.isNaN(Number(val)) && val < 0) {
       throw Error('Value number be a number greater than 0 or a Widget.');
@@ -264,12 +288,6 @@ export default class Widget extends EventSource {
     }
   }
 
-  /**
-   * If all items have in a container have grow set to 1, the remaining space in the container
-   * will be distributed equally to all children. If one of the children has a value of 2, that
-   * child would take up twice as much of the space either one of the others.
-   * @type {number}
-   */
   get grow() {
     return this.#grow;
   }
@@ -278,7 +296,7 @@ export default class Widget extends EventSource {
    * If all items have in a container have grow set to 1, the remaining space in the container
    * will be distributed equally to all children. If one of the children has a value of 2, that
    * child would take up twice as much of the space either one of the others.
-   * @type {number}
+   * @type {Number}
    */
   set grow(val) {
     if (Number.isNaN(Number(val)) || val < 1) {
@@ -287,11 +305,6 @@ export default class Widget extends EventSource {
     this.#grow = val;
   }
 
-  /**
-   * By default, items are laid out in the source order. However, the order property controls the
-   * order in which they appear in a container.
-   * @type {number}
-   */
   get order() {
     return this.#order;
   }
@@ -299,7 +312,7 @@ export default class Widget extends EventSource {
   /**
    * By default, items are laid out in the source order. However, the order property controls the
    * order in which they appear in a container.
-   * @type {number}
+   * @type {Number}
    */
   set order(val) {
     if (Number.isNaN(Number(val)) || val < 0) {
@@ -412,3 +425,5 @@ export default class Widget extends EventSource {
     this._postDraw(canvasCtx, depth);
   }
 }
+
+export default Widget;

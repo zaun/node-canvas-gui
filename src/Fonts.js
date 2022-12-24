@@ -16,7 +16,7 @@ const fonts = {
   },
 };
 
-const proxy = new Proxy(fonts, {
+const Fonts = new Proxy(fonts, {
   // Don't allow people to set properties directly
   set(target, prop) {
     if (fonts[prop]) {
@@ -42,4 +42,4 @@ const proxy = new Proxy(fonts, {
   },
 });
 
-export default proxy;
+export default Fonts;

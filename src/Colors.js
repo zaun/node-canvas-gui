@@ -4,7 +4,7 @@ import sbc from 'shade-blend-color';
 const ccc = new ColorContrastChecker();
 const pSBC = sbc.default;
 
-export default class Colors {
+class Colors {
   static White = '#ffffff';
   static Black = '#000000';
   static Transparent = '#00000000';
@@ -48,3 +48,5 @@ export default class Colors {
     Object.preventExtensions(this);
   }
 }
+
+export default Colors;

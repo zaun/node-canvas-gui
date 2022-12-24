@@ -2,11 +2,21 @@ import crypto from 'crypto';
 import { loadImage } from 'canvas';
 import Widget from './Widget.js';
 
-export default class Image extends Widget {
+/**
+ * The Image widget displays an image. The supported image types
+ * are any supported by the node-canvas loadImage function.
+ * @extends Widget
+ */
+class Image extends Widget {
   #src = '';
   #image = null;
   #loading = false;
 
+  /**
+   * Create a new Image.
+   * @param {Widget} parent Assign a parent Widget during creation
+   * @param {String} name Assign a name during creation
+   */
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
@@ -57,3 +67,5 @@ export default class Image extends Widget {
     }
   }
 }
+
+export default Image;
