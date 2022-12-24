@@ -3,7 +3,7 @@ export default class EventSource {
 
   get eventSource() {
     if (this._eventSource === null) {
-      if (this.parent !== null) {
+      if (this.parent instanceof EventSource) {
         return this.parent.eventSource;
       }
       return null;
@@ -62,7 +62,9 @@ export default class EventSource {
     });
 
     this._eventSource.on('keyDown', (event) => {
-      this._eventKeyDown(event);
+      if (typeof this._eventKeyDown === 'function') {
+        this._eventKeyDown(event);
+      }
     });
   }
 }

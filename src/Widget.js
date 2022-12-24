@@ -25,7 +25,6 @@ export default class Widget extends EventSource {
   #parent = null;
 
   #visible = true;
-  #borderColor = '#000000';
 
   #fixedWidth = 0;
   #fixedHeight = 0;
@@ -121,19 +120,8 @@ export default class Widget extends EventSource {
     return this.#visible;
   }
 
-  get borderColor() {
-    return this.#borderColor;
-  }
-
-  set borderColor(val) {
-    const color = val;
-    if (color[0] !== '#') {
-      return;
-    }
-    if (color.length !== 7) {
-      return;
-    }
-    this.#borderColor = color;
+  set visible(val) {
+    this.#visible = val === true;
   }
 
   get parent() {
@@ -293,7 +281,7 @@ export default class Widget extends EventSource {
    * @type {number}
    */
   set grow(val) {
-    if (val < 1) {
+    if (Number.isNaN(Number(val)) || val < 1) {
       throw Error('Invalid widget grow value.');
     }
     this.#grow = val;
@@ -314,7 +302,7 @@ export default class Widget extends EventSource {
    * @type {number}
    */
   set order(val) {
-    if (val < 0) {
+    if (Number.isNaN(Number(val)) || val < 0) {
       throw Error('Invalid widget order value.');
     }
     this.#order = val;
@@ -322,15 +310,6 @@ export default class Widget extends EventSource {
 
   // #endregion Position
   // #region Events
-
-  set onMouseClick(val) {
-    this._onMouseClick = null;
-    if (typeof val === 'function') {
-      this._onMouseClick = val;
-    }
-  }
-
-  // #endregion
 
   _eventMouseMove(event) {
     this._mousePosX = event.x;
@@ -380,6 +359,15 @@ export default class Widget extends EventSource {
   // eslint-disable-next-line class-methods-use-this
   _eventMouseWheel() {}
 
+  set onMouseClick(val) {
+    this._onMouseClick = null;
+    if (typeof val === 'function') {
+      this._onMouseClick = val;
+    }
+  }
+
+  // #endregion
+
   // eslint-disable-next-line class-methods-use-this
   _performLayout() { }
 
@@ -413,7 +401,7 @@ export default class Widget extends EventSource {
   // eslint-disable-next-line class-methods-use-this
   _postDraw() {
     // canvasCtx.beginPath();
-    // canvasCtx.strokeStyle = this.#borderColor;
+    // canvasCtx.strokeStyle = '#000000';
     // canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
     // canvasCtx.stroke();
   }

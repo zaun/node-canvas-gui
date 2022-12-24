@@ -357,10 +357,10 @@ export default class Container extends Widget {
   }
 
   _preDraw(canvasCtx, depth) {
-    super._preDraw(canvasCtx, depth);
     this.#children.forEach((w) => {
       w._preDraw(canvasCtx, depth + 1);
     });
+    super._preDraw(canvasCtx, depth);
   }
 
   _draw(canvasCtx, depth) {
