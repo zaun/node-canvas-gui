@@ -14,6 +14,11 @@ class Widget extends EventSource {
     return Widget.#debug;
   }
 
+  /**
+   * Set to true for debug console logs when drawing.
+   * @static
+   * @type {Boolean}
+   */
   static set debug(val) {
     Widget.#debug = val === true;
   }
@@ -22,6 +27,12 @@ class Widget extends EventSource {
     return Widget.#testing;
   }
 
+  /**
+   * Set to true when running unit tests. Prevents preventExtensions
+   * for all new widget instances.
+   * @static
+   * @type {Boolean}
+   */
   static set testing(val) {
     Widget.#testing = val === true;
   }
@@ -63,8 +74,8 @@ class Widget extends EventSource {
 
   /**
    * Create a new Widget.
-   * @param {Widget} parent Assign a parent Widget during creation
-   * @param {String} name Assign a name during creation
+   * @param {Widget} [parent=null] Assign a parent Widget during creation
+   * @param {String} [name=UUID] Assign a name during creation
    */
   constructor(parent = null, name = crypto.randomUUID()) {
     super();
@@ -120,14 +131,26 @@ class Widget extends EventSource {
     }
   }
 
+  /**
+   * True for the draw cycle when the mouse is clicked
+   * @type {Boolean}
+   */
   get mouseClick() {
     return this._mouseClick;
   }
 
+  /**
+   * True if the mouse is within the widgets container
+   * @type {Boolean}
+   */
   get mouseHover() {
     return this._mouseHover;
   }
 
+  /**
+   * The widgets name, should be unigue and defaults to a UUID.
+   * @type {String}
+   */
   get name() {
     return this.#name;
   }
@@ -136,6 +159,10 @@ class Widget extends EventSource {
     return this.#visible;
   }
 
+  /**
+   * Determins if the widget should be drawn or not
+   * @type {Boolean}
+   */
   set visible(val) {
     this.#visible = val === true;
   }
@@ -144,6 +171,10 @@ class Widget extends EventSource {
     return this.#parent;
   }
 
+  /**
+   * The widget's parent container
+   * @type {Container}
+   */
   set parent(val) {
     // can't use instanceof here as it would cause a dependancy cycle
     if (val !== null && !val.addChild) {
@@ -185,6 +216,17 @@ class Widget extends EventSource {
    * Location on screen of the widget.
    */
 
+  get container() {
+    const w = this.fixedWidth === 0 ? this.#container.w : this.fixedWidth;
+    const h = this.fixedHeight === 0 ? this.#container.h : this.fixedHeight;
+    return {
+      x: this.#container.x,
+      y: this.#container.y,
+      w,
+      h,
+    };
+  }
+
   /**
    * Set a widgets container. Sets the top, left,
    * width and height of the widget. Generally this only needs
@@ -213,17 +255,6 @@ class Widget extends EventSource {
     } else {
       throw Error('Widget container must be an array of four numbers');
     }
-  }
-
-  get container() {
-    const w = this.fixedWidth === 0 ? this.#container.w : this.fixedWidth;
-    const h = this.fixedHeight === 0 ? this.#container.h : this.fixedHeight;
-    return {
-      x: this.#container.x,
-      y: this.#container.y,
-      w,
-      h,
-    };
   }
 
   get fixedHeight() {
@@ -419,6 +450,11 @@ class Widget extends EventSource {
     // canvasCtx.stroke();
   }
 
+  /**
+   * Draw the current widget.
+   * @param {CanvasRenderingContext2D} canvasCtx Rendering context to draw to
+   * @param {Number} [depth=0] Recurring depth, generally this should not be used
+   */
   draw(canvasCtx, depth = 0) {
     this._preDraw(canvasCtx, depth);
     this._draw(canvasCtx, depth);
