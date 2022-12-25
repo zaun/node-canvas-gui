@@ -181,10 +181,11 @@ class Widget extends EventSource {
       throw Error('Parent must be a Container or null.');
     }
 
-    if (val === null) {
-      this.#parent.removeChild(this);
+    if (val === null && this.#parent !== null) {
+      const oldParent = this.#parent;
       this.#parent = null;
-    } else if (this.#parent === null || this.#parent.name !== val.name) {
+      oldParent.removeChild(this);
+    } else if (val !== null && (this.#parent === null || this.#parent.name !== val.name)) {
       this.#parent = val;
       val.addChild(this);
     }
@@ -273,9 +274,9 @@ class Widget extends EventSource {
    */
   set fixedHeight(val) {
     if (!Number.isNaN(Number(val)) && val < 0) {
-      throw Error('Value number be a number greater than 0 or a Widget.');
+      throw Error('Value must be a number greater than 0 or a Widget.');
     } else if (Number.isNaN(Number(val)) && !(val instanceof Widget)) {
-      throw Error('Value number be a number greater than 0 or a Widget.');
+      throw Error('Value must be a number greater than 0 or a Widget.');
     }
 
     if (this.#fixedHeight !== val) {

@@ -10,6 +10,7 @@ import Widget from '../src/Widget.js';
 
 describe('Testing the base Widget class', () => {
   beforeEach(() => {
+    Widget.debug = false;
     Widget.testing = true;
   });
 
@@ -709,6 +710,22 @@ describe('Testing the base Widget class', () => {
     });
   });
 
+  describe('Widget drawing', () => {
+    test('Should log drawing', () => {
+      const widget = new Widget();
+
+      const preSpy = jest.spyOn(widget, '_preDraw');
+      const drawSpy = jest.spyOn(widget, '_draw');
+      const postSpy = jest.spyOn(widget, '_postDraw');
+
+      widget.draw();
+
+      expect(preSpy).toHaveBeenCalledTimes(1);
+      expect(drawSpy).toHaveBeenCalledTimes(1);
+      expect(postSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('Widget debugging', () => {
     test('Should log drawing', () => {
       Widget.debug = true;
@@ -719,6 +736,18 @@ describe('Testing the base Widget class', () => {
       widget.draw();
 
       expect(logSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('Should not log exgtended drawing', () => {
+      Widget.debug = true;
+
+      const logSpy = jest.spyOn(console, 'log');
+
+      class Test extends Widget { }
+      const widget = new Test();
+      widget.draw();
+
+      expect(logSpy).toHaveBeenCalledTimes(0);
     });
   });
 });

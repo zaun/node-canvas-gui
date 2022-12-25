@@ -41,6 +41,12 @@ class Container extends Widget {
     return this.#JustifyItems;
   }
 
+  static {
+    Object.preventExtensions(this.#Orientation);
+    Object.preventExtensions(this.#AlignItems);
+    Object.preventExtensions(this.#JustifyItems);
+  }
+
   _orientation = Container.Orientation.Horizontal;
   #children = [];
   #spacing = 5;
@@ -84,8 +90,8 @@ class Container extends Widget {
   }
 
   set alignItems(val) {
-    if (!Object.values(Container.AlighItems).includes(val)) {
-      throw new Error('Invalid AlighItems');
+    if (!Object.values(Container.AlignItems).includes(val)) {
+      throw new Error('Invalid AlignItems');
     }
 
     if (this.#alignItems !== val) {
@@ -114,6 +120,10 @@ class Container extends Widget {
   }
 
   set spacing(val) {
+    if (Number.isNaN(Number(val)) || val < 0) {
+      throw Error('Value must be a number greater than 0 or a Widget.');
+    }
+
     this.#spacing = val;
     this._performLayout();
   }
@@ -290,7 +300,7 @@ class Container extends Widget {
   }
 
   removeChild(child) {
-    if (!this.#children.find((w) => w.name !== child.name)) {
+    if (!this.#children.find((w) => w.name === child.name)) {
       return;
     }
 
@@ -301,8 +311,10 @@ class Container extends Widget {
   }
 
   removeChildren() {
-    this.#children = [];
-    this._performLayout();
+    this.#children.forEach((w) => {
+      // eslint-disable-next-line no-param-reassign
+      w.parent = null;
+    });
   }
 
   _eventMouseMove(event) {
