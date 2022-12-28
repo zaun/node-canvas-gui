@@ -2,13 +2,16 @@ import crypto from 'crypto';
 import Widget from './Widget.js';
 import Container from './Container.js';
 import Panel from './Panel.js';
+import Shade from './Shade.js';
 
 // Force a fullscreen dialog that will prevent
 // mouse clicks from propigating to items below it.
 class ModalDialog extends Container {
   #modalRoot = new Container(null, 'ModalDialog Root');
-  #modalCenter = new Container();
+  #modalVerticalCenter = new Container();
+  #modalHorizontalCenter = new Container();
   #modalBody = new Panel(null, 'ModalDialog Body');
+  #shade = new Shade(null, 'ModalDialog Shade');
 
   /**
    * Create a new Widget.
@@ -18,22 +21,26 @@ class ModalDialog extends Container {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this.fixedSize = true;
+    this._absolutePosition = true;
 
     this.#modalRoot.container = [0, 0, global.window.width, global.window.height];
-    this.#modalRoot.addChild(new Widget());
-    this.#modalCenter.orientation = Container.Orientation.Vertical;
-    this.#modalRoot.addChild(this.#modalCenter);
-    this.#modalRoot.addChild(new Widget());
+    this.#shade.order = 1;
+    this.#modalVerticalCenter.order = 2;
+    this.#modalVerticalCenter.orientation = Container.Orientation.Vertical;
+    this.#modalHorizontalCenter.orientation = Container.Orientation.Horizontal;
 
-    this.#modalCenter.addChild(new Widget());
-    this.#modalCenter.addChild(this.#modalBody);
-    this.#modalCenter.addChild(new Widget());
+    this.#modalRoot.addChild(this.#shade);
+    this.#modalRoot.addChild(this.#modalVerticalCenter);
 
-    this.#modalBody.padding = [25, 25, 25, 25];
+    this.#modalVerticalCenter.addChild(new Widget());
+    this.#modalVerticalCenter.addChild(this.#modalHorizontalCenter);
+    this.#modalVerticalCenter.addChild(new Widget());
 
-    this.#modalRoot.onMouseClick = () => true;
-    this.onMouseClick = () => true;
+    this.#modalHorizontalCenter.addChild(new Widget());
+    this.#modalHorizontalCenter.addChild(this.#modalBody);
+    this.#modalHorizontalCenter.addChild(new Widget());
+
+    this.#modalBody.padding = 25;
 
     if (new.target === ModalDialog) {
       Object.preventExtensions(this);
@@ -49,11 +56,11 @@ class ModalDialog extends Container {
   }
 
   get fixedWidth() {
-    return this.#modalCenter.fixedWidth;
+    return this.#modalVerticalCenter.fixedWidth;
   }
 
   set fixedWidth(val) {
-    this.#modalCenter.fixedWidth = val;
+    this.#modalVerticalCenter.fixedWidth = val;
   }
 
   set onMouseClick(val) {
@@ -66,6 +73,14 @@ class ModalDialog extends Container {
 
   addChild(child) {
     this.#modalBody.addChild(child);
+  }
+
+  removeChild(child) {
+    this.#modalBody.removeChild(child);
+  }
+
+  removeChildren() {
+    this.#modalBody.removeChildren();
   }
 
   _eventMouseMove(event) {

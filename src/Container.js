@@ -52,6 +52,7 @@ class Container extends Widget {
   #spacing = 5;
   #alignItems = Container.AlignItems.Center;
   #justifyItems = Container.JustifyItems.Start;
+  #autoHeight = false;
 
   /**
    * Create a new Container.
@@ -128,6 +129,38 @@ class Container extends Widget {
     this._performLayout();
   }
 
+  get autoHeight() {
+    return this.#autoHeight;
+  }
+
+  /**
+   * When true automatically set the widget height to the size
+   * of the content. All child widgets must had a fixedHieght
+   * set or have autoHeight set. When false widget will be
+   * sized by it's parent.
+   */
+  set autoHeight(val) {
+    // If changing from fixed to unfixed then clear the
+    // current fixedHeight and update everything.
+    if (this.#autoHeight && !val) {
+      this.fixedHeight = 0;
+    }
+    this.#autoHeight = val;
+    this._performLayout();
+  }
+
+  get _sortedChildren() {
+    return this.#children.sort((a, b) => {
+      if (a.order > b.order) {
+        return 1;
+      }
+      if (a.order < b.order) {
+        return -1;
+      }
+      return 0;
+    });
+  }
+
   _performLayout() {
     let totalSpacing = 0;
     let childWidth = 0;
@@ -138,6 +171,7 @@ class Container extends Widget {
     let offset = 0;
     let children = [];
     let totalItemWidth = 0;
+    let totalHeight = 0;
 
     switch (this.orientation) {
       case Container.Orientation.Horizontal:
@@ -148,21 +182,21 @@ class Container extends Widget {
           return;
         }
 
-        children = this.#children.sort((a, b) => {
-          if (a.order > b.order) {
-            return 1;
-          }
-          if (a.order < b.order) {
-            return -1;
-          }
-          return 0;
-        });
+        children = this._sortedChildren.filter((i) => i._absolutePosition === false);
 
         children.forEach((w) => {
           fixed += w.fixedWidth;
           childCount += 1;
           if (w.fixedWidth === 0) {
             gridCount += w.grow;
+          }
+
+          if (this.#autoHeight) {
+            if (w.fixedHeight === 0) {
+              throw Error('Container autoHeight set with child that has no fixedHeight');
+            } else {
+              totalHeight += w.fixedHeight;
+            }
           }
         });
 
@@ -216,6 +250,13 @@ class Container extends Widget {
           w.container = [x + offset, y, newWidth, childHeight];
           offset += newWidth + this.#spacing;
         });
+
+        if (this.#autoHeight && this.fixedHeight !== totalHeight) {
+          this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
+          if (this.parent) {
+            this.parent._performLayout();
+          }
+        }
         break;
 
       case Container.Orientation.Vertical:
@@ -226,27 +267,30 @@ class Container extends Widget {
           return;
         }
 
-        children = this.#children.sort((a, b) => {
-          if (a.order > b.order) {
-            return 1;
-          }
-          if (a.order < b.order) {
-            return -1;
-          }
-          return 0;
-        });
+        children = this._sortedChildren.filter((i) => i._absolutePosition === false);
 
         children.forEach((w) => {
           fixed += w.fixedHeight;
           childCount += 1;
-          if (w.fixedWidth === 0) {
+          if (w.fixedHeight === 0) {
             gridCount += w.grow;
+          }
+
+          if (this.#autoHeight) {
+            if (w.fixedHeight === 0) {
+              throw Error('Container autoHeight set with child that has no fixedHeight');
+            } else {
+              totalHeight += w.fixedHeight;
+            }
           }
         });
 
         totalSpacing = (this.#spacing * (childCount - 1));
         if (totalSpacing < 0) {
           totalSpacing = 0;
+        }
+        if (this.#autoHeight) {
+          totalHeight += totalSpacing;
         }
 
         if (gridCount > 0) {
@@ -257,7 +301,7 @@ class Container extends Widget {
         }
         childWidth = this.body.w;
 
-        this.#children.forEach((w) => {
+        children.forEach((w) => {
           let { x } = this.body;
           const { y } = this.body;
 
@@ -281,6 +325,13 @@ class Container extends Widget {
             offset += w.fixedHeight + this.#spacing;
           }
         });
+
+        if (this.#autoHeight && this.fixedHeight !== totalHeight) {
+          this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
+          if (this.parent) {
+            this.parent._performLayout();
+          }
+        }
         break;
 
       default:
@@ -318,7 +369,7 @@ class Container extends Widget {
   }
 
   _eventMouseMove(event) {
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       w._eventMouseMove(event);
     });
     super._eventMouseMove(event);
@@ -326,7 +377,7 @@ class Container extends Widget {
 
   _eventMouseButtonDown(event) {
     let done = false;
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       if (!done) {
         done = w._eventMouseButtonDown(event);
       }
@@ -339,13 +390,13 @@ class Container extends Widget {
 
   _eventMouseButtonUp(event) {
     let done = false;
-    this.#children.forEach((w) => {
-      if (!done && w.fixedSize === true) {
+    this._sortedChildren.forEach((w) => {
+      if (!done) {
         done = w._eventMouseButtonUp(event);
       }
     });
-    this.#children.forEach((w) => {
-      if (!done && w.fixedSize !== true) {
+    this._sortedChildren.forEach((w) => {
+      if (!done) {
         done = w._eventMouseButtonUp(event);
       }
     });
@@ -357,7 +408,7 @@ class Container extends Widget {
 
   _eventKeyDown(event) {
     let done = false;
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       if (!done) {
         done = w._eventKeyDown(event);
       }
@@ -370,7 +421,7 @@ class Container extends Widget {
 
   _eventMouseWheel(event) {
     let done = false;
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       if (!done) {
         done = w._eventMouseWheel(event);
       }
@@ -382,7 +433,7 @@ class Container extends Widget {
   }
 
   _preDraw(canvasCtx, depth) {
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       w._preDraw(canvasCtx, depth + 1);
     });
     super._preDraw(canvasCtx, depth);
@@ -394,14 +445,15 @@ class Container extends Widget {
       this._logme(depth);
     }
 
-    this.#children.forEach((w) => {
+    this._sortedChildren.forEach((w) => {
       w._draw(canvasCtx, depth + 1);
     });
   }
 
   _postDraw(canvasCtx, depth) {
     super._postDraw(canvasCtx, depth);
-    this.#children.forEach((w) => {
+
+    this._sortedChildren.forEach((w) => {
       w._postDraw(canvasCtx, depth + 1);
       // canvasCtx.strokeStyle = '#333333';
       // canvasCtx.strokeRect(w.container.x, w.container.y, w.container.w, w.container.h);

@@ -7,7 +7,7 @@ import Canvas from 'canvas';
 import {
   Widget,
   Container,
-  // ModalDialog,
+  ModalDialog,
   Colors,
   Panel,
   Label,
@@ -219,42 +219,42 @@ menu.addChild(makeMenuButton('Input', () => {
   display.addChild(makeCenter(tmp));
 }));
 
-// menu.addChild(makeMenuButton('Modal Dialog', () => {
-//   display.removeChildren();
+menu.addChild(makeMenuButton('Modal Dialog', () => {
+  display.removeChildren();
 
-//   const dialog = new ModalDialog(null, 'test');
-//   const c = new Container();
-//   c.orientation = Container.Orientation.Vertical;
-//   dialog.addChild(c);
+  const dialog = new ModalDialog(null, 'test');
+  const c = new Container();
+  c.orientation = Container.Orientation.Vertical;
+  dialog.addChild(c);
 
-//   const l = new Label();
-//   l.text = 'This a a modal dialog box. The context\nof the box are completly user controlled.';
-//   // l.backgroundColor = '#aa0000';
-//   l.fixedHeight = 140;
-//   c.addChild(l);
+  const l = new Label();
+  l.text = 'This a a modal dialog box. The context\nof the box are completly user controlled.';
+  // l.backgroundColor = '#aa0000';
+  l.fixedHeight = 140;
+  c.addChild(l);
 
-//   const h = new Container();
-//   c.addChild(h);
+  const h = new Container();
+  c.addChild(h);
 
-//   const b = new Button();
-//   b.text = 'Close';
-//   b.onMouseClick = () => {
-//     display.removeChild(dialog);
-//   };
+  const b = new Button();
+  b.text = 'Close';
+  b.onMouseClick = () => {
+    display.removeChild(dialog);
+  };
 
-//   h.addChild(new Container());
-//   h.addChild(new Container());
-//   h.addChild(b);
+  h.addChild(new Container());
+  h.addChild(new Container());
+  h.addChild(b);
 
-//   const tmp = new Button();
-//   tmp.text = 'Open ModalDialog';
-//   tmp.fixedHeight = 50;
-//   tmp.onMouseClick = () => {
-//     display.addChild(dialog);
-//   };
+  const tmp = new Button();
+  tmp.text = 'Open ModalDialog';
+  tmp.fixedHeight = 50;
+  tmp.onMouseClick = () => {
+    display.addChild(dialog);
+  };
 
-//   display.addChild(makeCenter(tmp));
-// }));
+  display.addChild(makeCenter(tmp));
+}));
 
 const main = async () => {
   while (!global.window.destroyed) {

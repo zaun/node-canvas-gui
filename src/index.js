@@ -10,6 +10,7 @@ import Button from './Button.js';
 import Image from './Image.js';
 import Input from './Input.js';
 import Text from './Text.js';
+import Shade from './Shade.js';
 import Spinner from './Spinner.js';
 
 Fonts.addFont('Beyond Wonderland', 'Beyond Wonderland.ttf');
@@ -46,6 +47,7 @@ export {
   List,
   ModalDialog,
   Panel,
+  Shade,
   Spinner,
   Text,
   Widget,

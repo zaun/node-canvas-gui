@@ -63,6 +63,7 @@ class Widget extends EventSource {
   #grow = 1;
 
   // extended classes need access to these.
+  _absolutePosition = false;
 
   _mousePosX = 0;
   _mousePosY = 0;

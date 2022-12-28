@@ -21,7 +21,7 @@ export default () => {
 
   const buttonBar = new Container(null, 'Button Bar');
   buttonBar.orientation = Container.Orientation.Vertical;
-  buttonBar.fixedHeight = 7 * (40 + buttonBar.spacing);
+  buttonBar.autoHeight = true;
 
   let row = new Container(buttonBar);
   row.fixedHeight = 40;
