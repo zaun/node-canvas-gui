@@ -20,9 +20,9 @@ const Fonts = new Proxy(fonts, {
   // Don't allow people to set properties directly
   set(target, prop) {
     if (fonts[prop]) {
-      throw Error('Can not change existing fonts.');
+      throw new Error('Can not change existing fonts.');
     }
-    throw Error('Please use Fonts.addFont method to add new fonts.');
+    throw new Error('Please use Fonts.addFont method to add new fonts.');
   },
 
   // Return the font family name

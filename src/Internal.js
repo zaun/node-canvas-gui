@@ -12,7 +12,7 @@ class AutoNumber {
       this.#auto = true;
       this.#value = 0;
     } else if (Number.isNaN(value) || value < 0) {
-      throw Error('Value must be \'AUTO\' or a positive value');
+      throw new Error('Value must be \'AUTO\' or a positive value');
     }
 
     this.#auto = false;
@@ -33,7 +33,7 @@ class PositiveNumber {
 
   constructor(value) {
     if (Number.isNaN(value) || value < 0) {
-      throw Error('Value must be a positive value');
+      throw new Error('Value must be a positive value');
     }
 
     this.value = true;

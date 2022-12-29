@@ -45,7 +45,7 @@ class Shade extends Container {
 
   set opacity(val) {
     if (Number.isNaN(Number(val)) || val < 0 || val > 1) {
-      throw Error('Value number be a number between 0 and 1');
+      throw new Error('Value number be a number between 0 and 1');
     }
 
     this.#opacity = val;

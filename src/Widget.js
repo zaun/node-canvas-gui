@@ -20,6 +20,10 @@ class Widget extends EventSource {
    * @type {Boolean}
    */
   static set debug(val) {
+    if (typeof val !== 'boolean') {
+      throw new Error('Value must be Boolean');
+    }
+
     Widget.#debug = val === true;
   }
 
@@ -34,6 +38,10 @@ class Widget extends EventSource {
    * @type {Boolean}
    */
   static set testing(val) {
+    if (typeof val !== 'boolean') {
+      throw new Error('Value must be Boolean');
+    }
+
     Widget.#testing = val === true;
   }
 
@@ -122,7 +130,7 @@ class Widget extends EventSource {
         r: val[3],
       };
     } else {
-      throw Error('Widget padding must be a number or an array of four numbers');
+      throw new Error('Widget padding must be a number or an array of four numbers');
     }
 
     if (this.#parent) {
@@ -165,6 +173,9 @@ class Widget extends EventSource {
    * @type {Boolean}
    */
   set visible(val) {
+    if (typeof val !== 'boolean') {
+      throw new Error('Value must be Boolean');
+    }
     this.#visible = val === true;
   }
 
@@ -179,7 +190,7 @@ class Widget extends EventSource {
   set parent(val) {
     // can't use instanceof here as it would cause a dependancy cycle
     if (val !== null && !val.addChild) {
-      throw Error('Parent must be a Container or null.');
+      throw new Error('Parent must be a Container or null.');
     }
 
     if (val === null && this.#parent !== null) {
@@ -255,7 +266,7 @@ class Widget extends EventSource {
         this._performLayout();
       }
     } else {
-      throw Error('Widget container must be an array of four numbers');
+      throw new Error('Widget container must be an array of four numbers');
     }
   }
 
@@ -275,9 +286,9 @@ class Widget extends EventSource {
    */
   set fixedHeight(val) {
     if (!Number.isNaN(Number(val)) && val < 0) {
-      throw Error('Value must be a number greater than 0 or a Widget.');
+      throw new Error('Value must be a number greater than 0 or a Widget.');
     } else if (Number.isNaN(Number(val)) && !(val instanceof Widget)) {
-      throw Error('Value must be a number greater than 0 or a Widget.');
+      throw new Error('Value must be a number greater than 0 or a Widget.');
     }
 
     if (this.#fixedHeight !== val) {
@@ -306,9 +317,9 @@ class Widget extends EventSource {
    */
   set fixedWidth(val) {
     if (!Number.isNaN(Number(val)) && val < 0) {
-      throw Error('Value number be a number greater than 0 or a Widget.');
+      throw new Error('Value number be a number greater than 0 or a Widget.');
     } else if (Number.isNaN(Number(val)) && !(val instanceof Widget)) {
-      throw Error('Value number be a number greater than 0 or a Widget.');
+      throw new Error('Value number be a number greater than 0 or a Widget.');
     }
 
     if (this.#fixedWidth !== val) {
@@ -333,7 +344,7 @@ class Widget extends EventSource {
    */
   set grow(val) {
     if (Number.isNaN(Number(val)) || val < 1) {
-      throw Error('Invalid widget grow value.');
+      throw new Error('Invalid widget grow value.');
     }
     this.#grow = val;
   }
@@ -349,7 +360,7 @@ class Widget extends EventSource {
    */
   set order(val) {
     if (Number.isNaN(Number(val)) || val < 0) {
-      throw Error('Invalid widget order value.');
+      throw new Error('Invalid widget order value.');
     }
     this.#order = val;
   }
@@ -427,13 +438,7 @@ class Widget extends EventSource {
 
   _preDraw() {
     if (this._mouseClick && this._onMouseClick !== null) {
-      if (this._onMouseClick() === true) {
-        let p = this.#parent;
-        while (p !== null) {
-          p._mouseClick = false;
-          p = p.#parent;
-        }
-      }
+      this._onMouseClick();
     }
     this._mouseClick = false;
   }

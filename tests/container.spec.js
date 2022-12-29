@@ -282,12 +282,56 @@ describe('Testing the Container class', () => {
       expect(localSpy).toHaveBeenCalledTimes(0);
     });
 
-    test('Should not set aligorientationnItems to invalid value', () => {
+    test('Should not set orientation to invalid value', () => {
       const widget = new Container();
 
       expect(() => {
         widget.orientation = 'FOO';
       }).toThrow();
+    });
+
+    test('Should set autoHeight to true', () => {
+      const widget = new Container();
+
+      const localSpy = jest.spyOn(widget, '_performLayout');
+
+      widget.autoHeight = true;
+
+      expect(widget.autoHeight).toEqual(true);
+      expect(localSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('Should clear fixedHeight if setting autoHeight to false', () => {
+      const widget = new Container();
+      widget.orientation = Container.Orientation.Vertical;
+      const child = new Widget();
+      child.fixedHeight = 10;
+      child.parent = widget;
+
+      const localSpy = jest.spyOn(widget, '_performLayout');
+
+      widget.autoHeight = true;
+
+      expect(widget.autoHeight).toEqual(true);
+      expect(widget.fixedHeight).toEqual(10);
+      expect(localSpy).toHaveBeenCalledTimes(3);
+
+      widget.autoHeight = false;
+      expect(widget.autoHeight).toEqual(false);
+      expect(localSpy).toHaveBeenCalledTimes(4);
+      expect(widget.fixedHeight).toEqual(0);
+    });
+
+    test('Should not set autoHeight to non boolean', () => {
+      const widget = new Container();
+
+      const localSpy = jest.spyOn(widget, '_performLayout');
+
+      expect(() => {
+        widget.autoHeight = 'true';
+      }).toThrow();
+
+      expect(localSpy).toHaveBeenCalledTimes(0);
     });
   });
 
@@ -320,7 +364,7 @@ describe('Testing the Container class', () => {
       expect(child.mouseHover).toEqual(false);
     });
 
-    test('Should handle mouse events outside widget container', () => {
+    test('Should handle mouse button events', () => {
       const widget = new Container();
       widget.eventSource = mockEventSource;
       widget.container = [0, 0, 5, 5];

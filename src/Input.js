@@ -132,7 +132,7 @@ class Input extends Widget {
     } else if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
       this.#radii = val;
     } else {
-      throw Error('Panel radii must be a number or an array of four numbers');
+      throw new Error('Panel radii must be a number or an array of four numbers');
     }
   }
 
@@ -170,7 +170,7 @@ class Input extends Widget {
         this.padding = [4, 4, 8, 8];
         break;
       default:
-        throw Error('Invalid size');
+        throw new Error('Invalid size');
     }
   }
 

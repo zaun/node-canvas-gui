@@ -196,7 +196,7 @@ class Button extends Widget {
         this.padding = [4, 4, 8, 8];
         break;
       default:
-        throw Error('Invalid size');
+        throw new Error('Invalid size');
     }
     this._performLayout();
   }

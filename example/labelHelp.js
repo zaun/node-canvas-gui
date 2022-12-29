@@ -23,10 +23,10 @@ export default () => {
   buttonBar.orientation = Container.Orientation.Vertical;
   buttonBar.autoHeight = true;
 
-  let row = new Container(buttonBar);
+  let row = new Container(buttonBar, 'Font Justification Change Bar');
   row.fixedHeight = 40;
 
-  // Font size change buttons
+  // Font justification change buttons
   const justifyItems = Object.keys(Label.Justify);
   const justifyButtons = {};
   justifyItems.forEach((item) => {
@@ -52,7 +52,7 @@ export default () => {
   });
 
   // Font size change buttons
-  row = new Container(buttonBar);
+  row = new Container(buttonBar, 'Font Size Change Buttons');
   row.fixedHeight = 40;
 
   const fontSizes = [16, 18, 20, 24, 30, 36, 42, 48, 60, 72, 84];
@@ -82,7 +82,7 @@ export default () => {
   // Font change buttons
   Object.keys(Fonts).forEach((font, idx) => {
     if (idx % 5 === 0) {
-      row = new Container(buttonBar);
+      row = new Container(buttonBar, `Font Button Bar ${idx / 5}`);
       row.fixedHeight = 40;
     }
     const btnFont = new Button(row);

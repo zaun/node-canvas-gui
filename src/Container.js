@@ -105,6 +105,9 @@ class Container extends Widget {
     return this.#justifyItems;
   }
 
+  /**
+   * @type {JustifyItems}
+   */
   set justifyItems(val) {
     if (!Object.values(Container.JustifyItems).includes(val)) {
       throw new Error('Invalid JustifyItems');
@@ -120,9 +123,13 @@ class Container extends Widget {
     return this.#spacing;
   }
 
+  /**
+   * Number of pixels spaced between each child
+   * @type {Number}
+   */
   set spacing(val) {
     if (Number.isNaN(Number(val)) || val < 0) {
-      throw Error('Value must be a number greater than 0 or a Widget.');
+      throw new Error('Value must be a number greater than 0 or a Widget.');
     }
 
     this.#spacing = val;
@@ -138,18 +145,29 @@ class Container extends Widget {
    * of the content. All child widgets must had a fixedHieght
    * set or have autoHeight set. When false widget will be
    * sized by it's parent.
+   * @type {Boolean}
    */
   set autoHeight(val) {
+    if (typeof val !== 'boolean') {
+      throw new Error('Value must be Boolean');
+    }
+
     // If changing from fixed to unfixed then clear the
     // current fixedHeight and update everything.
     if (this.#autoHeight && !val) {
+      this.#autoHeight = val;
       this.fixedHeight = 0;
+    } else {
+      this.#autoHeight = val;
+      this._performLayout();
     }
-    this.#autoHeight = val;
-    this._performLayout();
   }
 
-  get _sortedChildren() {
+  /**
+   * Return child widgets sorted by the widget's order
+   * @private
+   */
+  get #sortedChildren() {
     return this.#children.sort((a, b) => {
       if (a.order > b.order) {
         return 1;
@@ -161,6 +179,11 @@ class Container extends Widget {
     });
   }
 
+  /**
+   * Update each child widget's container based on
+   * the currently selected configuration.
+   * @private
+   */
   _performLayout() {
     let totalSpacing = 0;
     let childWidth = 0;
@@ -182,7 +205,11 @@ class Container extends Widget {
           return;
         }
 
-        children = this._sortedChildren.filter((i) => i._absolutePosition === false);
+        // Exclude absolutely positioned children and
+        // and children without a fixedHeight if Container is set to autoHeight
+        children = this.#sortedChildren
+          .filter((i) => i._absolutePosition === false)
+          .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
 
         children.forEach((w) => {
           fixed += w.fixedWidth;
@@ -192,11 +219,7 @@ class Container extends Widget {
           }
 
           if (this.#autoHeight) {
-            if (w.fixedHeight === 0) {
-              throw Error('Container autoHeight set with child that has no fixedHeight');
-            } else {
-              totalHeight += w.fixedHeight;
-            }
+            totalHeight += w.fixedHeight;
           }
         });
 
@@ -255,6 +278,8 @@ class Container extends Widget {
           this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
           if (this.parent) {
             this.parent._performLayout();
+          } else {
+            this._performLayout();
           }
         }
         break;
@@ -263,11 +288,15 @@ class Container extends Widget {
         if (this.#children.length === 0) {
           return;
         }
-        if (this.body.h === 0) {
+        if (this.body.h === 0 && !this.autoHeight) {
           return;
         }
 
-        children = this._sortedChildren.filter((i) => i._absolutePosition === false);
+        // Exclude absolutely positioned children and
+        // and children without a fixedHeight if Container is set to autoHeight
+        children = this.#sortedChildren
+          .filter((i) => i._absolutePosition === false)
+          .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
 
         children.forEach((w) => {
           fixed += w.fixedHeight;
@@ -277,11 +306,7 @@ class Container extends Widget {
           }
 
           if (this.#autoHeight) {
-            if (w.fixedHeight === 0) {
-              throw Error('Container autoHeight set with child that has no fixedHeight');
-            } else {
-              totalHeight += w.fixedHeight;
-            }
+            totalHeight += w.fixedHeight;
           }
         });
 
@@ -330,6 +355,8 @@ class Container extends Widget {
           this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
           if (this.parent) {
             this.parent._performLayout();
+          } else {
+            this._performLayout();
           }
         }
         break;
@@ -369,95 +396,74 @@ class Container extends Widget {
   }
 
   _eventMouseMove(event) {
-    this._sortedChildren.forEach((w) => {
+    this.#sortedChildren.forEach((w) => {
       w._eventMouseMove(event);
     });
     super._eventMouseMove(event);
   }
 
   _eventMouseButtonDown(event) {
-    let done = false;
-    this._sortedChildren.forEach((w) => {
-      if (!done) {
-        done = w._eventMouseButtonDown(event);
-      }
+    this.#sortedChildren.forEach((w) => {
+      w._eventMouseButtonDown(event);
     });
-    if (!done) {
-      done = super._eventMouseButtonDown(event);
-    }
-    return done;
+    super._eventMouseButtonDown(event);
   }
 
   _eventMouseButtonUp(event) {
-    let done = false;
-    this._sortedChildren.forEach((w) => {
-      if (!done) {
-        done = w._eventMouseButtonUp(event);
-      }
+    this.#sortedChildren.forEach((w) => {
+      w._eventMouseButtonUp(event);
     });
-    this._sortedChildren.forEach((w) => {
-      if (!done) {
-        done = w._eventMouseButtonUp(event);
-      }
-    });
-    if (!done) {
-      done = super._eventMouseButtonUp(event);
-    }
-    return done;
+    super._eventMouseButtonUp(event);
   }
 
   _eventKeyDown(event) {
-    let done = false;
-    this._sortedChildren.forEach((w) => {
-      if (!done) {
-        done = w._eventKeyDown(event);
-      }
+    this.#sortedChildren.forEach((w) => {
+      w._eventKeyDown(event);
     });
-    if (!done) {
-      done = super._eventKeyDown(event);
-    }
-    return done;
+    super._eventKeyDown(event);
   }
 
   _eventMouseWheel(event) {
-    let done = false;
-    this._sortedChildren.forEach((w) => {
-      if (!done) {
-        done = w._eventMouseWheel(event);
-      }
+    this.#sortedChildren.forEach((w) => {
+      w._eventMouseWheel(event);
     });
-    if (!done) {
-      done = super._eventMouseWheel(event);
-    }
-    return done;
+    super._eventMouseWheel(event);
   }
 
   _preDraw(canvasCtx, depth) {
-    this._sortedChildren.forEach((w) => {
+    let stopClick = false;
+    this.#sortedChildren.forEach((w) => {
+      const child = w;
+      if (child._mouseClick && child._onMouseClick !== null && !stopClick) {
+        stopClick = w._onMouseClick();
+      }
+      child._mouseClick = false;
+
       w._preDraw(canvasCtx, depth + 1);
     });
-    super._preDraw(canvasCtx, depth);
+
+    if (stopClick && this.parent) {
+      this.parent._mouseClick = false;
+    }
   }
 
   _draw(canvasCtx, depth) {
-    super._draw(canvasCtx, depth);
     if (this.constructor.name === 'Container') {
       this._logme(depth);
     }
 
-    this._sortedChildren.forEach((w) => {
+    this.#sortedChildren.forEach((w) => {
       w._draw(canvasCtx, depth + 1);
     });
   }
 
   _postDraw(canvasCtx, depth) {
-    super._postDraw(canvasCtx, depth);
-
-    this._sortedChildren.forEach((w) => {
+    this.#sortedChildren.forEach((w) => {
       w._postDraw(canvasCtx, depth + 1);
       // canvasCtx.strokeStyle = '#333333';
       // canvasCtx.strokeRect(w.container.x, w.container.y, w.container.w, w.container.h);
     });
+    super._postDraw(canvasCtx, depth);
   }
 }
 

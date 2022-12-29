@@ -74,7 +74,7 @@ class Panel extends Container {
     } else if (Array.isArray(val) && val.length === 4 && onlyNumbers(val)) {
       this.#radii = val;
     } else {
-      throw Error('Panel radii must be a number or an array of four numbers');
+      throw new Error('Panel radii must be a number or an array of four numbers');
     }
   }
 

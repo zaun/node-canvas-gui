@@ -19,12 +19,26 @@ describe('Testing the base Widget class', () => {
     jest.clearAllMocks();
   });
 
-  test('Static debug should be false', async () => {
+  test('Static test static property debug', async () => {
     expect(Widget.debug).toEqual(false);
     Widget.debug = true;
     expect(Widget.debug).toEqual(true);
     Widget.debug = false;
     expect(Widget.debug).toEqual(false);
+
+    expect(() => {
+      Widget.debug = 'foo';
+    }).toThrow();
+  });
+
+  test('Static test static property test', async () => {
+    expect(Widget.testing).toEqual(true);
+    Widget.testing = false;
+    expect(Widget.testing).toEqual(false);
+
+    expect(() => {
+      Widget.testing = 'foo';
+    }).toThrow();
   });
 
   describe('Widget contrustor tests', () => {
@@ -451,8 +465,9 @@ describe('Testing the base Widget class', () => {
       widget.visible = false;
       expect(widget.visible).toEqual(false);
 
-      widget.visible = 'foo';
-      expect(widget.visible).toEqual(false);
+      expect(() => {
+        widget.visible = 'foo';
+      }).toThrow();
     });
   });
 
@@ -560,130 +575,27 @@ describe('Testing the base Widget class', () => {
       expect(widget._onMouseClick).toHaveBeenCalledTimes(1);
     });
 
-    test('Should handle parent onMouseClick callback', () => {
-      const parent = new Container();
-      parent.eventSource = mockEventSource;
-      parent.container = [0, 0, 50, 50];
-      parent.onMouseClick = jest.fn();
-
+    test('Should not set onMouseClick to non-function', () => {
       const widget = new Widget();
-      widget.parent = parent;
+      widget.onMouseClick = 'foo';
+      expect(widget._onMouseClick).toEqual(null);
+    });
+
+    test('Should handle clearing mouseClick', () => {
+      const widget = new Widget(null, 'widget');
+      widget.container = [0, 0, 50, 50];
+      widget.eventSource = mockEventSource;
       widget.onMouseClick = jest.fn();
 
       mockEventSource.mouseButtonDown({ x: 20, y: 30 });
       mockEventSource.mouseButtonUp({ x: 20, y: 30 });
 
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      parent.draw(mockCtx);
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(1);
+      expect(widget.mouseClick).toEqual(true);
+      widget.draw(mockCtx);
+      expect(widget.mouseClick).toEqual(false);
     });
 
-    test('Should handle parent onMouseClick callback no back propigate', () => {
-      const parent = new Container();
-      parent.eventSource = mockEventSource;
-      parent.container = [0, 0, 50, 50];
-      parent.onMouseClick = jest.fn();
-
-      const widget = new Widget();
-      widget.parent = parent;
-      widget.onMouseClick = jest.fn().mockReturnValue(true);
-
-      mockEventSource.mouseButtonDown({ x: 20, y: 30 });
-      mockEventSource.mouseButtonUp({ x: 20, y: 30 });
-
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      parent.draw(mockCtx);
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-    });
-
-    test('Should handle multi-parent onMouseClick callback no back propigate', () => {
-      let parentReturn = false;
-      let widgetReturn = true;
-
-      const root = new Container(null, 'root');
-      root.eventSource = mockEventSource;
-      root.container = [0, 0, 50, 50];
-      root.onMouseClick = jest.fn();
-
-      const parent = new Container(null, 'parent');
-      parent.parent = root;
-      parent.onMouseClick = jest.fn().mockImplementation(() => parentReturn);
-
-      const widget = new Widget(null, 'widget');
-      widget.parent = parent;
-      widget.onMouseClick = jest.fn().mockImplementation(() => widgetReturn);
-
-      mockEventSource.mouseButtonDown({ x: 20, y: 30 });
-      mockEventSource.mouseButtonUp({ x: 20, y: 30 });
-
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-      root.draw(mockCtx);
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-
-      widgetReturn = false;
-      parentReturn = true;
-      jest.clearAllMocks();
-
-      mockEventSource.mouseButtonDown({ x: 20, y: 30 });
-      mockEventSource.mouseButtonUp({ x: 20, y: 30 });
-
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-      root.draw(mockCtx);
-      expect(widget._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-
-      jest.clearAllMocks();
-      widget.onMouseClick = null;
-
-      mockEventSource.mouseButtonDown({ x: 20, y: 30 });
-      mockEventSource.mouseButtonUp({ x: 20, y: 30 });
-
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-      root.draw(mockCtx);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-    });
-
-    test('Should handle clearing an onMouseClick callback', () => {
-      const root = new Container(null, 'root');
-      root.eventSource = mockEventSource;
-      root.container = [0, 0, 50, 50];
-      root.onMouseClick = jest.fn();
-
-      const parent = new Container(null, 'parent');
-      parent.parent = root;
-      parent.onMouseClick = jest.fn();
-
-      const widget = new Widget(null, 'widget');
-      widget.parent = parent;
-      widget.onMouseClick = jest.fn();
-      widget.onMouseClick = null;
-
-      mockEventSource.mouseButtonDown({ x: 20, y: 30 });
-      mockEventSource.mouseButtonUp({ x: 20, y: 30 });
-
-      expect(widget._onMouseClick).toEqual(null);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(0);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(0);
-      root.draw(mockCtx);
-      expect(widget._onMouseClick).toEqual(null);
-      expect(parent._onMouseClick).toHaveBeenCalledTimes(1);
-      expect(root._onMouseClick).toHaveBeenCalledTimes(1);
-    });
-
-    test('Should handle keyyDown event', () => {
+    test('Should handle keyDown event', () => {
       const widget = new Container(null, 'root');
       widget.eventSource = mockEventSource;
 
