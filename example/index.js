@@ -22,6 +22,7 @@ import {
 import createButtonHelp from './buttonHelp.js';
 import createContainerHelp from './containerHelp.js';
 import createLabelHelp from './labelHelp.js';
+import createSpinnerHelp from './spinnerHelp.js';
 
 // Widget.debug = true;
 
@@ -104,6 +105,12 @@ menu.addChild(makeMenuButton('Button', () => {
 menu.addChild(makeMenuButton('Container', () => {
   display.removeChildren();
   const containerScreen = createContainerHelp();
+  display.addChild(containerScreen);
+}));
+
+menu.addChild(makeMenuButton('Spinner', () => {
+  display.removeChildren();
+  const containerScreen = createSpinnerHelp();
   display.addChild(containerScreen);
 }));
 
