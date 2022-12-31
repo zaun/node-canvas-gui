@@ -430,21 +430,14 @@ class Container extends Widget {
     super._eventMouseWheel(event);
   }
 
-  _preDraw(canvasCtx, depth) {
-    let stopClick = false;
-    this.#sortedChildren.forEach((w) => {
-      const child = w;
-      if (child._mouseClick && child._onMouseClick !== null && !stopClick) {
-        stopClick = w._onMouseClick();
-      }
-      child._mouseClick = false;
-
-      w._preDraw(canvasCtx, depth + 1);
+  /**
+   * Handle mouse click for the Container and all it's children
+   */
+  _preDraw() {
+    this.#sortedChildren.slice().reverse().forEach((w) => {
+      w._preDraw();
     });
-
-    if (stopClick && this.parent) {
-      this.parent._mouseClick = false;
-    }
+    super._preDraw();
   }
 
   _draw(canvasCtx, depth) {
@@ -463,7 +456,6 @@ class Container extends Widget {
       // canvasCtx.strokeStyle = '#333333';
       // canvasCtx.strokeRect(w.container.x, w.container.y, w.container.w, w.container.h);
     });
-    super._postDraw(canvasCtx, depth);
   }
 }
 

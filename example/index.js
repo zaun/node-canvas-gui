@@ -11,16 +11,14 @@ import {
   Colors,
   Panel,
   Label,
-  // Button,
-  Image,
   Input,
   List,
   Button,
-  // Text,
 } from '../src/index.js';
 
 import createButtonHelp from './buttonHelp.js';
 import createContainerHelp from './containerHelp.js';
+import createImageHelp from './imageHelp.js';
 import createLabelHelp from './labelHelp.js';
 import createSpinnerHelp from './spinnerHelp.js';
 
@@ -116,11 +114,9 @@ menu.addChild(makeMenuButton('Spinner', () => {
 
 menu.addChild(makeMenuButton('Image', () => {
   display.removeChildren();
+  const containerScreen = createImageHelp();
 
-  const tmp = new Image();
-  tmp.src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/SNice.svg/768px-SNice.svg.png';
-
-  display.addChild(makeCenter(tmp));
+  display.addChild(containerScreen);
 }));
 
 menu.addChild(makeMenuButton('Label', () => {

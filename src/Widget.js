@@ -79,7 +79,7 @@ class Widget extends EventSource {
   _mouseHover = false;
   _mouseDown = false;
   _mouseClick = false;
-  _onMouseClick = null;
+  #onMouseClick = null;
 
   /**
    * Create a new Widget.
@@ -416,10 +416,14 @@ class Widget extends EventSource {
   // eslint-disable-next-line class-methods-use-this
   _eventMouseWheel() {}
 
+  get onMouseClick() {
+    return this.#onMouseClick;
+  }
+
   set onMouseClick(val) {
-    this._onMouseClick = null;
+    this.#onMouseClick = null;
     if (typeof val === 'function') {
-      this._onMouseClick = val;
+      this.#onMouseClick = val;
     }
   }
 
@@ -437,10 +441,19 @@ class Widget extends EventSource {
   }
 
   _preDraw() {
-    if (this._mouseClick && this._onMouseClick !== null) {
-      this._onMouseClick();
+    let stopClick = false;
+    if (this._mouseClick && this.#onMouseClick !== null) {
+      stopClick = this.#onMouseClick();
     }
     this._mouseClick = false;
+
+    if (stopClick && this.parent) {
+      let p = this.parent;
+      do {
+        p._mouseClick = false;
+        p = p.parent;
+      } while (p !== null);
+    }
   }
 
   _draw(canvasCtx, depth) {
@@ -459,11 +472,11 @@ class Widget extends EventSource {
 
   /**
    * Draw the current widget.
-   * @param {CanvasRenderingContext2D} canvasCtx Rendering context to draw to
-   * @param {Number} [depth=0] Recurring depth, generally this should not be used
+   * @param {CanvasRenderingContext2D} canvasCtx Rendering context to draw on
+   * @param {Number} [depth=0] Recurring call depth
    */
   draw(canvasCtx, depth = 0) {
-    this._preDraw(canvasCtx, depth);
+    this._preDraw();
     this._draw(canvasCtx, depth);
     this._postDraw(canvasCtx, depth);
   }

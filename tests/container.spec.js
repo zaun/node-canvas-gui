@@ -423,7 +423,6 @@ describe('Testing the Container class', () => {
       widget.draw({});
 
       expect(childPre).toHaveBeenCalledTimes(1);
-      expect(childPre).toHaveBeenCalledWith({}, 1);
       expect(childDraw).toHaveBeenCalledTimes(1);
       expect(childDraw).toHaveBeenCalledWith({}, 1);
       expect(childPost).toHaveBeenCalledTimes(1);

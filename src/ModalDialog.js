@@ -6,7 +6,7 @@ import Shade from './Shade.js';
 
 // Force a fullscreen dialog that will prevent
 // mouse clicks from propigating to items below it.
-class ModalDialog extends Container {
+class ModalDialog extends Widget {
   #modalRoot = new Container(null, 'ModalDialog Root');
   #modalVerticalCenter = new Container();
   #modalHorizontalCenter = new Container();
@@ -98,20 +98,20 @@ class ModalDialog extends Container {
     return true;
   }
 
+  _preDraw() {
+    this.#modalRoot._preDraw();
+    super._preDraw();
+  }
+
   _draw(canvasCtx, depth) {
-    super._draw(canvasCtx, depth);
     if (this.constructor.name === 'ModalDialog') {
       this._logme(depth);
     }
+    this.#modalRoot._draw(canvasCtx, depth + 1);
   }
 
   _postDraw(canvasCtx, depth) {
-    super._postDraw(canvasCtx, depth);
-
-    this.#modalRoot.draw(canvasCtx, depth + 1);
-    if (this.parent) {
-      this.parent._mouseClick = this.#modalRoot._mouseClick;
-    }
+    this.#modalRoot._postDraw(canvasCtx, depth + 1);
   }
 }
 
