@@ -5,14 +5,12 @@ import sdl from '@kmamal/sdl';
 import { setTimeout } from 'timers/promises';
 import Canvas from 'canvas';
 import {
-  Widget,
   Container,
   ModalDialog,
   Colors,
   Panel,
   Label,
   Input,
-  List,
   Button,
 } from '../src/index.js';
 
@@ -20,6 +18,7 @@ import createButtonHelp from './buttonHelp.js';
 import createContainerHelp from './containerHelp.js';
 import createImageHelp from './imageHelp.js';
 import createLabelHelp from './labelHelp.js';
+import createListHelp from './listHelp.js';
 import createSpinnerHelp from './spinnerHelp.js';
 
 // Widget.debug = true;
@@ -127,82 +126,8 @@ menu.addChild(makeMenuButton('Label', () => {
 
 menu.addChild(makeMenuButton('List', () => {
   display.removeChildren();
-
-  const list = new List();
-  list.itemHeight = 30;
-  list.items = [
-    'Yellow',
-    'Yellow Green',
-    'Violet Red',
-    'Violet',
-    'Wheat',
-    'Turquoise',
-    'Tomato',
-    'Thistle',
-    'Tan',
-    'Steel Blue',
-    'Spring Green',
-    'Slate Gray',
-    'Sky Blue',
-    'Sienna',
-    'Sea Green',
-    'Salmon',
-    'Orange Red',
-    'Navy Blue',
-    'Lime Green',
-    'Light Sea Green',
-    'Hot Pink',
-    'Dark Green',
-    'Blue',
-    'Black',
-    'Brown',
-    'Alice Blue',
-    'Antique White',
-    'Aquamarine',
-    'Azure',
-    'Blanched Almond',
-    'Blue Violet',
-    'Burlywood',
-    'Cadet Blue',
-    'Chartreuse',
-    'Chocolate',
-    'Coral',
-    'Cornflower Blue',
-    'Cornsilk',
-    'Cyan',
-    'Dark Goldenrod',
-    'Dark Olive Green',
-    'Deep Pink',
-    'Deep Sky Blue',
-    'Dim Gray',
-    'Dodger Blue',
-    'Firebrick',
-    'Forest Green',
-    'Gold',
-    'Gray',
-    'Indian Red',
-  ];
-
-  list.itemCreate = (i) => {
-    const l = new Label();
-    l.text = i;
-    l.fontSize = 20;
-    return l;
-  };
-
-  const p = new Panel(null, 'test');
-  p.setColor(Colors.Indigo);
-  p.padding = 5;
-  p.addChild(list);
-
-  const h = new Container();
-  h.orientation = Container.Orientation.Horizontal;
-  h.addChild(new Widget());
-  h.addChild(p);
-  h.addChild(new Widget());
-  h.padding = [40, 40, 0, 0];
-
-  display.addChild(h);
+  const containerScreen = createListHelp();
+  display.addChild(containerScreen);
 }));
 
 menu.addChild(makeMenuButton('Panel', () => {

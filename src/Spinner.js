@@ -69,6 +69,14 @@ class Spinner extends Widget {
     this.#fontSize = val;
   }
 
+  get text() {
+    return this.#text;
+  }
+
+  set text(val) {
+    this.#text = val;
+  }
+
   _performLayout() {
     if (this.#stopped) {
       return;

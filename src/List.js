@@ -10,11 +10,13 @@ class List extends Widget {
   #items = [];
   #itemHeight = 1;
   #itemWidgets = [];
-  // eslint-disable-next-line class-methods-use-this
   #itemCreate = null;
 
   #view = null;
   #scroll = 0;
+  #cols = 1;
+
+  #spacing = 5;
 
   /**
    * Create a new List.
@@ -29,6 +31,19 @@ class List extends Widget {
     if (new.target === List) {
       Object.preventExtensions(this);
     }
+  }
+
+  get cols() {
+    return this.#cols;
+  }
+
+  set cols(val) {
+    if (Number.isNaN(Number(val)) || val < 1) {
+      throw new Error('Value must be a number greater or equal to 1.');
+    }
+
+    this.#cols = val;
+    this._performLayout();
   }
 
   get items() {
@@ -58,8 +73,18 @@ class List extends Widget {
     this._performLayout();
   }
 
+  get spacing() {
+    return this.#spacing;
+  }
+
+  set spacing(val) {
+    this.#spacing = val;
+    this._performLayout();
+  }
+
   get #maxScroll() {
-    const itemsHeight = this.#items.length * this.#itemHeight;
+    const rowCount = Math.ceil(this.#items.length / this.#cols);
+    const itemsHeight = rowCount * (this.#itemHeight + this.spacing) - this.spacing;
     if (itemsHeight > this.body.h) {
       return itemsHeight - this.body.h;
     }
@@ -96,19 +121,81 @@ class List extends Widget {
 
   _performLayout() {
     this.#itemWidgets = [];
-    this.#view = Canvas.createCanvas(this.body.w, this.#itemHeight * this.#items.length);
-    const viewCtx = this.#view.getContext('2d');
 
+    const rowCount = Math.ceil(this.#items.length / this.#cols);
+    let viewHeight = ((this.#itemHeight + this.spacing) * rowCount) - this.spacing;
+    if (viewHeight < 0) {
+      viewHeight = 0;
+    }
+
+    this.#view = Canvas.createCanvas(this.body.w, viewHeight);
+
+    const totalSpaceing = this.spacing * (this.#cols - 1);
+    const itemWidth = ((this.body.w - totalSpaceing) / this.#cols);
+    let itemY = 0;
     this.#items.forEach((i, idx) => {
+      const col = (idx % this.#cols);
+      const itemX = col * itemWidth;
+
       const w = this.#itemCreate(i);
-      w.container = [0, idx * this.#itemHeight, this.body.w, this.#itemHeight];
-      w.draw(viewCtx);
+      w.container = [itemX + (col * this.spacing), itemY, itemWidth, this.#itemHeight];
+
       this.#itemWidgets.push(w);
+
+      if (col === this.#cols - 1) {
+        itemY += this.#itemHeight + this.spacing;
+      }
     });
+
+    this.#updateView();
 
     if (this.#maxScroll === 0) {
       this.#scroll = 0;
     }
+  }
+
+  #updateView() {
+    const viewCtx = this.#view.getContext('2d');
+
+    viewCtx.clearRect(0, 0, this.#view.width, this.#view.height);
+    this.#itemWidgets.forEach((w) => {
+      w.draw(viewCtx);
+    });
+  }
+
+  _eventMouseMove(event) {
+    this.#itemWidgets.forEach((w) => {
+      w._eventMouseMove({
+        x: event.x - this.body.x,
+        y: event.y - this.body.y + this.#scroll,
+      });
+    });
+    super._eventMouseMove(event);
+  }
+
+  _eventMouseButtonDown(event) {
+    this.#itemWidgets.forEach((w) => {
+      w._eventMouseButtonDown(event);
+    });
+    super._eventMouseButtonDown(event);
+  }
+
+  _eventMouseButtonUp(event) {
+    this.#itemWidgets.forEach((w) => {
+      w._eventMouseButtonUp(event);
+    });
+    super._eventMouseButtonUp(event);
+  }
+
+  _eventKeyDown(event) {
+    this.#itemWidgets.forEach((w) => {
+      w._eventKeyDown(event);
+    });
+    super._eventKeyDown(event);
+  }
+
+  _preDraw() {
+    this.#updateView();
   }
 
   _draw(canvasCtx, depth = 0) {
