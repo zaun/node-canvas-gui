@@ -206,10 +206,10 @@ class Container extends Widget {
           return;
         }
 
-        // Exclude absolutely positioned children and
+        // Exclude manually positioned children and
         // and children without a fixedHeight if Container is set to autoHeight
         children = this.#sortedChildren
-          .filter((i) => i._absolutePosition === false)
+          .filter((i) => i._manualPosition === false)
           .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
 
         children.forEach((w) => {
@@ -293,10 +293,10 @@ class Container extends Widget {
           return;
         }
 
-        // Exclude absolutely positioned children and
+        // Exclude manually positioned children and
         // and children without a fixedHeight if Container is set to autoHeight
         children = this.#sortedChildren
-          .filter((i) => i._absolutePosition === false)
+          .filter((i) => i._manualPosition === false)
           .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
 
         children.forEach((w) => {
@@ -367,9 +367,9 @@ class Container extends Widget {
           return;
         }
 
-        // Exclude absolutely positioned children
+        // Exclude manually positioned children
         children = this.#sortedChildren
-          .filter((i) => i._absolutePosition === false);
+          .filter((i) => i._manualPosition === false);
 
         children.forEach((w) => {
           // eslint-disable-next-line no-param-reassign

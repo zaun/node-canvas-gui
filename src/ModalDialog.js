@@ -21,7 +21,7 @@ class ModalDialog extends Widget {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this._absolutePosition = true;
+    this._manualPosition = true;
 
     this.#modalRoot.container = [0, 0, global.window.width, global.window.height];
     this.#shade.order = 1;

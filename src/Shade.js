@@ -14,7 +14,7 @@ class Shade extends Container {
   constructor(parent = null, name = crypto.randomUUID()) {
     super(parent, name);
 
-    this._absolutePosition = true;
+    this._manualPosition = true;
     this.color = Colors.Black;
     this.container = [0, 0, global.window.width, global.window.height];
 
