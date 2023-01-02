@@ -13,6 +13,7 @@ class Container extends Widget {
   static #Orientation = {
     Horizontal: 0,
     Vertical: 1,
+    Stack: 2,
   };
 
   static #AlignItems = {
@@ -359,6 +360,22 @@ class Container extends Widget {
             this._performLayout();
           }
         }
+        break;
+
+      case Container.Orientation.Stack:
+        if (this.#children.length === 0) {
+          return;
+        }
+
+        // Exclude absolutely positioned children
+        children = this.#sortedChildren
+          .filter((i) => i._absolutePosition === false);
+
+        children.forEach((w) => {
+          // eslint-disable-next-line no-param-reassign
+          w.container = [this.body.x, this.body.y, this.body.w, this.body.h];
+        });
+
         break;
 
       default:

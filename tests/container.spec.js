@@ -30,7 +30,7 @@ describe('Testing the Container class', () => {
 
     test('Static have emuns', async () => {
       expect(Container.Orientation).toBeDefined();
-      expect(Object.keys(Container.Orientation)).toHaveLength(2);
+      expect(Object.keys(Container.Orientation)).toHaveLength(3);
       expect(() => {
         Container.Orientation.foo = 99;
       }).toThrow();
