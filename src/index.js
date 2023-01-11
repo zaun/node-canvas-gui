@@ -12,6 +12,7 @@ import Input from './Input.js';
 import Text from './Text.js';
 import Shade from './Shade.js';
 import Spinner from './Spinner.js';
+import Switch from './Switch.js';
 
 Fonts.addFont('Beyond Wonderland', 'Beyond Wonderland.ttf');
 Fonts.addFont('Kenney Blocks', 'Kenney Blocks.ttf');
@@ -49,6 +50,7 @@ export {
   Panel,
   Shade,
   Spinner,
+  Switch,
   Text,
   Widget,
 };

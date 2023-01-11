@@ -20,6 +20,7 @@ import createImageHelp from './imageHelp.js';
 import createLabelHelp from './labelHelp.js';
 import createListHelp from './listHelp.js';
 import createSpinnerHelp from './spinnerHelp.js';
+import createSwitchHelp from './switchHelp.js';
 
 // Widget.debug = true;
 
@@ -97,6 +98,12 @@ menu.addChild(makeMenuButton('Button', () => {
   display.removeChildren();
   const buttonScreen = createButtonHelp();
   display.addChild(buttonScreen);
+}));
+
+menu.addChild(makeMenuButton('Switch', () => {
+  display.removeChildren();
+  const containerScreen = createSwitchHelp();
+  display.addChild(containerScreen);
 }));
 
 menu.addChild(makeMenuButton('Container', () => {
