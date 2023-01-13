@@ -196,13 +196,14 @@ class Container extends Widget {
     let children = [];
     let totalItemWidth = 0;
     let totalHeight = 0;
+    let maxHeight = 0;
 
     switch (this.orientation) {
       case Container.Orientation.Horizontal:
         if (this.#children.length === 0) {
           return;
         }
-        if (this.body.w === 0) {
+        if (this.body.h === 0 && !this.autoHeight) {
           return;
         }
 
@@ -219,8 +220,8 @@ class Container extends Widget {
             gridCount += w.grow;
           }
 
-          if (this.#autoHeight) {
-            totalHeight += w.fixedHeight;
+          if (this.#autoHeight && maxHeight < w.fixedHeight) {
+            maxHeight = w.fixedHeight;
           }
         });
 
@@ -275,8 +276,8 @@ class Container extends Widget {
           offset += newWidth + this.#spacing;
         });
 
-        if (this.#autoHeight && this.fixedHeight !== totalHeight) {
-          this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
+        if (this.#autoHeight && this.fixedHeight !== maxHeight + this.padding.t + this.padding.b) {
+          this.fixedHeight = maxHeight + this.padding.t + this.padding.b;
           if (this.parent) {
             this.parent._performLayout();
           } else {
@@ -352,7 +353,10 @@ class Container extends Widget {
           }
         });
 
-        if (this.#autoHeight && this.fixedHeight !== totalHeight) {
+        if (
+          this.#autoHeight
+          && this.fixedHeight !== totalHeight + this.padding.t + this.padding.b
+        ) {
           this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
           if (this.parent) {
             this.parent._performLayout();
@@ -384,6 +388,10 @@ class Container extends Widget {
   }
 
   addChild(child) {
+    if (child instanceof Widget !== true) {
+      throw Error('Must add Widget');
+    }
+
     if (this.#children.find((w) => w.name === child.name)) {
       return;
     }
@@ -395,6 +403,10 @@ class Container extends Widget {
   }
 
   removeChild(child) {
+    if (child instanceof Widget !== true) {
+      throw Error('Must remove Widget');
+    }
+
     if (!this.#children.find((w) => w.name === child.name)) {
       return;
     }

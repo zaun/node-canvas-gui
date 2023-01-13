@@ -179,7 +179,7 @@ class Button extends Widget {
     switch (size) {
       case Button.Size.Large:
         this.fixedHeight = 48;
-        this.fontSize = 20;
+        this.#fontSize = 20;
         this.radii = [8, 8, 8, 8];
         this.padding = [8, 8, 16, 16];
         break;
@@ -191,14 +191,19 @@ class Button extends Widget {
         break;
       case Button.Size.Small:
         this.fixedHeight = 31;
-        this.fontSize = 14;
+        this.#fontSize = 14;
         this.radii = [4, 4, 4, 4];
         this.padding = [4, 4, 8, 8];
         break;
       default:
         throw new Error('Invalid size');
     }
-    this._performLayout();
+
+    if (this.parent) {
+      this.parent._performLayout();
+    } else {
+      this._performLayout();
+    }
   }
 
   _performLayout() {

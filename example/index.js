@@ -21,6 +21,7 @@ import createLabelHelp from './labelHelp.js';
 import createListHelp from './listHelp.js';
 import createSpinnerHelp from './spinnerHelp.js';
 import createSwitchHelp from './switchHelp.js';
+import creatTextHelp from './textHelp.js';
 
 // Widget.debug = true;
 
@@ -121,7 +122,6 @@ menu.addChild(makeMenuButton('Spinner', () => {
 menu.addChild(makeMenuButton('Image', () => {
   display.removeChildren();
   const containerScreen = createImageHelp();
-
   display.addChild(containerScreen);
 }));
 
@@ -134,6 +134,12 @@ menu.addChild(makeMenuButton('Label', () => {
 menu.addChild(makeMenuButton('List', () => {
   display.removeChildren();
   const containerScreen = createListHelp();
+  display.addChild(containerScreen);
+}));
+
+menu.addChild(makeMenuButton('Text', () => {
+  display.removeChildren();
+  const containerScreen = creatTextHelp();
   display.addChild(containerScreen);
 }));
 

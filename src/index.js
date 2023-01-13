@@ -11,6 +11,7 @@ import Image from './Image.js';
 import Input from './Input.js';
 import Text from './Text.js';
 import Shade from './Shade.js';
+import ScrollView from './ScrollView.js';
 import Spinner from './Spinner.js';
 import Switch from './Switch.js';
 
@@ -49,6 +50,7 @@ export {
   ModalDialog,
   Panel,
   Shade,
+  ScrollView,
   Spinner,
   Switch,
   Text,
