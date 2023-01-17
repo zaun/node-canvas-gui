@@ -64,13 +64,15 @@ class ScrollView extends Widget {
     ];
 
     this.#child._performLayout();
-
     this.#view = Canvas.createCanvas(this.#child.container.w, this.#child.container.h);
 
     this.#updateView();
   }
 
   #updateView(depth = 0) {
+    if (this.#view === null) {
+      return;
+    }
     const viewCtx = this.#view.getContext('2d');
 
     viewCtx.clearRect(0, 0, this.#view.width, this.#view.height);

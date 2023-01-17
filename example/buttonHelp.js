@@ -8,14 +8,12 @@ import {
 import util from './util.js';
 
 export default () => {
-  const screen = new ScrollView();
+  const screen = new ScrollView(null, 'Scroll');
 
   // Split the view for a top tab bar
   const view = new Container();
   view.orientation = Container.Orientation.Vertical;
   view.autoHeight = true;
-
-  screen.child = view;
 
   const sectionA = new Text();
   sectionA.parent = view;
@@ -206,5 +204,6 @@ exampleCButtons.autoHeight = true;
   );
   exampleC.parent = view;
 
+  screen.child = view;
   return screen;
 };

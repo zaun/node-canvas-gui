@@ -22,7 +22,7 @@ class Button extends Widget {
   };
 
   #borderColor = '';
-  #borderWidth = 4;
+  #borderWidth = 2;
 
   #radii = [6, 6, 6, 6];
 
@@ -150,15 +150,15 @@ class Button extends Widget {
   get #calcForeground() {
     let foregroundColor = this.#foregroundColor;
 
-    if (!this._mouseHover && this.mode === Button.Mode.Outline) {
-      foregroundColor = this.#backgroundColor;
-    }
-
     if (this._mouseHover && this.mode !== Button.Mode.Outline) {
       foregroundColor = this.#hoverForegroundColor;
     }
 
     if (this._mouseHover && this.mode === Button.Mode.Outline) {
+      foregroundColor = this.#hoverBorderColor;
+    }
+
+    if (!this._mouseHover && this.mode === Button.Mode.Outline) {
       foregroundColor = this.#hoverBackgroundColor;
     }
 
@@ -170,7 +170,7 @@ class Button extends Widget {
     this.#borderColor = Colors.darker(val);
     this.#foregroundColor = Colors.foregroundFor(this.#backgroundColor);
     this.#hoverBackgroundColor = Colors.darker(val);
-    this.#hoverBorderColor = Colors.darker(val);
+    this.#hoverBorderColor = Colors.darker(val, 2);
     this.#hoverForegroundColor = Colors.foregroundFor(this.#hoverBackgroundColor);
     this._performLayout();
   }
@@ -209,23 +209,7 @@ class Button extends Widget {
   _performLayout() {
     try {
       this.#view = Canvas.createCanvas(this.body.w, this.body.h);
-      const viewCtx = this.#view.getContext('2d');
-
-      viewCtx.fillStyle = this.#calcForeground;
-      viewCtx.font = `${this.#fontSize}px ${this.#font}`;
-
-      const chInfo = viewCtx.measureText(this.#text);
-      let x = (this.body.w / 2) - (chInfo.width / 2);
-      if (x < 0) {
-        x = 0;
-      }
-
-      let y = this.body.h / 2;
-      y += (chInfo.emHeightAscent / 2);
-      y -= (chInfo.emHeightDescent / 2);
-
-      viewCtx.clearRect(0, 0, this.body.w, this.body.h);
-      viewCtx.fillText(this.#text, x, y);
+      this.#updateView();
     } catch (e) {
       // FIXME: I don't know why this is happening. It's like this
       //        function is being called with the wrong 'this' sometimes.
@@ -233,6 +217,31 @@ class Button extends Widget {
       // console.log(this.name, this.constructor.name, this.text);
       // console.log(this.parent ? this.parent.name : '');
     }
+  }
+
+  #updateView() {
+    if (this.#view === null) {
+      return;
+    }
+
+    const viewCtx = this.#view.getContext('2d');
+    viewCtx.clearRect(0, 0, this.#view.width, this.#view.height);
+
+    viewCtx.fillStyle = this.#calcForeground;
+    viewCtx.font = `${this.#fontSize}px ${this.#font}`;
+
+    const chInfo = viewCtx.measureText(this.#text);
+    let x = (this.body.w / 2) - (chInfo.width / 2);
+    if (x < 0) {
+      x = 0;
+    }
+
+    let y = this.body.h / 2;
+    y += (chInfo.emHeightAscent / 2);
+    y -= (chInfo.emHeightDescent / 2);
+
+    viewCtx.clearRect(0, 0, this.body.w, this.body.h);
+    viewCtx.fillText(this.#text, x, y);
   }
 
   _draw(canvasCtx, depth = 0) {

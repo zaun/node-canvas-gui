@@ -16,7 +16,7 @@ class Button extends Widget {
   };
 
   #borderColor = '';
-  #borderWidth = 4;
+  #borderWidth = 2;
 
   #radii = [6, 6, 6, 6];
 
