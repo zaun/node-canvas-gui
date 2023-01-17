@@ -9,8 +9,9 @@ import Widget from './Widget.js';
  */
 class Image extends Widget {
   static #Mode = {
-    Cover: 0,
+    ScaleToCover: 0,
     ScaleToFill: 1,
+    Stretch: 2,
   };
 
   static get Mode() {
@@ -104,9 +105,13 @@ class Image extends Widget {
       return;
     }
 
+    canvasCtx.save();
+    canvasCtx.rect(this.body.x, this.body.y, this.body.w, this.body.h);
+    canvasCtx.clip();
+
     if (this.mode === Image.Mode.ScaleToFill) {
-      const hRatio = this.body.w / this.body.h;
-      const vRatio = this.body.h / this.body.w;
+      const hRatio = this.body.h / this.#image.height;
+      const vRatio = this.body.w / this.#image.width;
       const ratio = Math.min(hRatio, vRatio);
       const offsetX = (this.body.w - this.#image.width * ratio) / 2;
       const offsetY = (this.body.h - this.#image.height * ratio) / 2;
@@ -122,7 +127,25 @@ class Image extends Widget {
         this.#image.width * ratio,
         this.#image.height * ratio,
       );
-    } else if (this.mode === Image.Mode.Cover) {
+    } else if (this.mode === Image.Mode.ScaleToCover) {
+      const hRatio = this.body.h / this.#image.height;
+      const vRatio = this.body.w / this.#image.width;
+      const ratio = Math.max(hRatio, vRatio);
+      const offsetX = (this.body.w - this.#image.width * ratio) / 2;
+      const offsetY = (this.body.h - this.#image.height * ratio) / 2;
+
+      canvasCtx.drawImage(
+        this.#image,
+        0,
+        0,
+        this.#image.width,
+        this.#image.height,
+        this.body.x + offsetX,
+        this.body.y + offsetY,
+        this.#image.width * ratio,
+        this.#image.height * ratio,
+      );
+    } else if (this.mode === Image.Mode.Stretch) {
       canvasCtx.drawImage(
         this.#image,
         this.body.x,
@@ -131,6 +154,8 @@ class Image extends Widget {
         this.body.h,
       );
     }
+
+    canvasCtx.restore();
   }
 }
 
