@@ -11,6 +11,7 @@ import Container from '../src/Container.js';
 import Image from '../src/Image.js';
 import Panel from '../src/Panel.js';
 import Widget from '../src/Widget.js';
+import Colors from '../src/Colors.js';
 
 const toMatchImageSnapshot = jestImageSnapshot.configureToMatchImageSnapshot({
   customSnapshotsDir: './tests/testImages',
@@ -135,6 +136,14 @@ describe('Testing the Container class', () => {
       expect(widget.children).toHaveLength(1);
     });
 
+    test('Should not add a non-widget', () => {
+      const widget = new Container();
+
+      expect(() => {
+        widget.addChild('child');
+      }).toThrow();
+    });
+
     test('Should remove a child', () => {
       const widget = new Container();
       const child = new Widget();
@@ -184,6 +193,14 @@ describe('Testing the Container class', () => {
 
       expect(child.parent).toEqual(widgetB);
       expect(localSpy).toHaveBeenCalledTimes(0);
+    });
+
+    test('Should not remove a non-widget', () => {
+      const widget = new Container();
+
+      expect(() => {
+        widget.removeChild('child');
+      }).toThrow();
     });
   });
 
@@ -449,6 +466,227 @@ describe('Testing the Container class', () => {
       expect(childPost).toHaveBeenCalledWith({}, 1);
     });
 
+    describe('Horizontal children', () => {
+      let canvas;
+      let context;
+      let widget;
+      let red;
+      let green;
+      let blue;
+
+      beforeEach(() => {
+        widget = new Container();
+        widget.container = [0, 0, 500, 500];
+
+        red = new Panel();
+        red.setColor(Colors.Red);
+
+        green = new Panel();
+        green.setColor(Colors.Green);
+
+        blue = new Panel();
+        blue.setColor(Colors.Blue);
+
+        canvas = Canvas.createCanvas(500, 500);
+        context = canvas.getContext('2d');
+      });
+
+      test('Should position children evenly', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+
+        red.parent = widget;
+        green.parent = widget;
+
+        widget.draw(context);
+
+        /**
+         * red = 1 half
+         * green = 1 half
+         */
+        const testImageA = canvas.toBuffer('image/png');
+        expect(testImageA).toMatchImageSnapshot(); // 50/50
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        blue.parent = widget;
+
+        widget.draw(context);
+
+        /**
+         * red = 1 thirds
+         * green = 1 thrid
+         * blue = 1 thrid
+         */
+        const testImageB = canvas.toBuffer('image/png');
+        expect(testImageB).toMatchImageSnapshot(); // 33/33/33
+      });
+
+      test('Should position children evenly ordered by the order property', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+
+        red.parent = widget;
+        red.order = 3;
+        green.parent = widget;
+        green.order = 1;
+        blue.parent = widget;
+        blue.order = 2;
+
+        widget.draw(context);
+
+        /**
+         * Order = green, blue, red
+         */
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should size childred based on the grow property', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+
+        red.parent = widget;
+        red.grow = 2;
+        green.parent = widget;
+
+        widget.draw(context);
+
+        /**
+         * red = 2 thirds
+         * green = 1 thrid
+         */
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should start justify children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Start;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        green.parent = widget;
+        green.fixedWidth = 25;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should center justify children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Center;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        green.parent = widget;
+        green.fixedWidth = 25;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should end justify children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.End;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        green.parent = widget;
+        green.fixedWidth = 25;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should add space around justify children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Around;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        green.parent = widget;
+        green.fixedWidth = 25;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should add space between justify children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Between;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        green.parent = widget;
+        green.fixedWidth = 25;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should start align children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Around;
+        widget.alignItems = Container.AlignItems.Start;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        red.fixedHeight = 100;
+        green.parent = widget;
+        green.fixedWidth = 25;
+        green.fixedHeight = 75;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should end align children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Around;
+        widget.alignItems = Container.AlignItems.End;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        red.fixedHeight = 100;
+        green.parent = widget;
+        green.fixedWidth = 25;
+        green.fixedHeight = 75;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+
+      test('Should center align children', () => {
+        widget.orientation = Container.Orientation.Horizontal;
+        widget.justifyItems = Container.JustifyItems.Around;
+        widget.alignItems = Container.AlignItems.Center;
+
+        red.parent = widget;
+        red.fixedWidth = 25;
+        red.fixedHeight = 100;
+        green.parent = widget;
+        green.fixedWidth = 25;
+        green.fixedHeight = 75;
+
+        widget.draw(context);
+
+        const testImage = canvas.toBuffer('image/png');
+        expect(testImage).toMatchImageSnapshot();
+      });
+    });
+
     describe('Stacked children', () => {
       test('should stack children', async () => {
         const widget = new Container();
@@ -471,6 +709,7 @@ describe('Testing the Container class', () => {
         const testImage = windowCanvas.toBuffer('image/png');
         expect(testImage).toMatchImageSnapshot();
       });
+
       test('should stack ordered children', async () => {
         const widget = new Container();
         widget.padding = 10;
