@@ -4,7 +4,7 @@ import {
   Container,
   ScrollView,
   Text,
-} from '../src/index.js';
+} from '../../src/index.js';
 import util from './util.js';
 
 export default () => {

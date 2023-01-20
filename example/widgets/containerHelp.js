@@ -3,7 +3,7 @@ import {
   Container,
   Label,
   Panel,
-} from '../src/index.js';
+} from '../../src/index.js';
 
 export default () => {
   const createItem = (label) => {

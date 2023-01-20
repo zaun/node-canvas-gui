@@ -1,7 +1,7 @@
 import {
   Container,
   Switch,
-} from '../src/index.js';
+} from '../../src/index.js';
 
 export default () => {
   // Split the screen for a top tab bar

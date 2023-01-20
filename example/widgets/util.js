@@ -3,7 +3,7 @@ import {
   Colors,
   Panel,
   Text,
-} from '../src/index.js';
+} from '../../src/index.js';
 
 const createExample = (exampleWidget, exampleCode) => {
   const example = new Container();

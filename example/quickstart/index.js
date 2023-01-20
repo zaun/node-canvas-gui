@@ -1,11 +1,6 @@
-# node-canvas-gui
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+/* eslint-disable no-await-in-loop */
+/* eslint-disable import/no-extraneous-dependencies */
 
-Offering a set of UI elements to be used with the node-canvas and node-sdl.
-
-## Quick Start Example (node-canvas and node-sdl)
-
-```
 import Canvas from 'canvas';
 import sdl from '@kmamal/sdl';
 import { setTimeout } from 'timers/promises';
@@ -16,7 +11,7 @@ import {
   Panel,
   Label,
   Button,
-} from 'node-sdl';
+} from '../../src/index.js';
 
 // Create window
 global.window = sdl.video.createWindow({
@@ -70,4 +65,3 @@ const main = async () => {
 };
 
 main();
-```

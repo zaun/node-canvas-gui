@@ -5,7 +5,7 @@ import {
   Label,
   Spinner,
   Text,
-} from '../src/index.js';
+} from '../../src/index.js';
 
 import util from './util.js';
 

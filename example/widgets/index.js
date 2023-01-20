@@ -12,7 +12,7 @@ import {
   Label,
   Input,
   Button,
-} from '../src/index.js';
+} from '../../src/index.js';
 
 import createButtonHelp from './buttonHelp.js';
 import createContainerHelp from './containerHelp.js';
