@@ -1,5 +1,6 @@
 # node-canvas-gui
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Build](https://github.com/zaun/node-canvas-gui/actions/workflows/node.js.yml/badge.svg)
 
 Offering a set of UI elements to be used with the node-canvas and node-sdl.
 
