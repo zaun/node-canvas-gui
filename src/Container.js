@@ -195,6 +195,7 @@ class Container extends Widget {
     let offset = 0;
     let children = [];
     let totalItemWidth = 0;
+    let totalItemHeight = 0;
     let totalHeight = 0;
     let maxHeight = 0;
 
@@ -329,8 +330,14 @@ class Container extends Widget {
         childWidth = this.body.w;
 
         children.forEach((w) => {
+          const itemHeight = Math.floor(w.fixedHeight === 0 ? w.grow * childHeight : w.fixedHeight);
+          totalItemHeight += itemHeight + this.#spacing;
+        });
+        totalItemHeight -= this.#spacing;
+
+        children.forEach((w, idx) => {
           let { x } = this.body;
-          const { y } = this.body;
+          let { y } = this.body;
 
           if (w.fixedWidth) {
             if (this.body.w > w.container.w
@@ -339,6 +346,19 @@ class Container extends Widget {
             } else if (this.#alignItems === Container.AlignItems.End) {
               x += (this.container.w - w.container.w);
             }
+          }
+
+          const extraSpace = this.body.h - totalItemHeight;
+          if (this.#justifyItems === Container.JustifyItems.Center) {
+            y += extraSpace / 2;
+          } else if (this.#justifyItems === Container.JustifyItems.End) {
+            y += extraSpace;
+          } else if (this.#justifyItems === Container.JustifyItems.Between) {
+            if (idx < children.length) {
+              y += (extraSpace / (children.length - 1)) * idx;
+            }
+          } else if (this.#justifyItems === Container.JustifyItems.Around) {
+            y += (extraSpace / (children.length + 1)) * (idx + 1);
           }
 
           if (w.fixedHeight === 0) {
