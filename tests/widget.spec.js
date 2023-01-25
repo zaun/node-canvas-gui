@@ -658,10 +658,35 @@ describe('Testing the base Widget class', () => {
     });
   });
 
-  describe('Widget debugging', () => {
-    test('Should log drawing', () => {
-      Widget.debug = true;
+  describe('Widget root properties', () => {
+    test('Should return own width and height if no parent', () => {
+      const widget = new Widget();
+      widget.container = [0, 0, 10, 10];
 
+      expect(widget.rootWidth).toEqual(10);
+      expect(widget.rootHeight).toEqual(10);
+    });
+
+    test('Should return width and height of root parent', () => {
+      const root = new Container();
+      const widget = new Widget(root);
+      root.container = [0, 0, 10, 10];
+
+      expect(widget.rootWidth).toEqual(10);
+      expect(widget.rootHeight).toEqual(10);
+    });
+  });
+
+  describe('Widget debugging', () => {
+    beforeEach(() => {
+      Widget.debug = true;
+    });
+
+    afterEach(() => {
+      Widget.debug = false;
+    });
+
+    test('Should log drawing', () => {
       const logSpy = jest.spyOn(console, 'log');
 
       const widget = new Widget();
@@ -671,8 +696,6 @@ describe('Testing the base Widget class', () => {
     });
 
     test('Should not log exgtended drawing', () => {
-      Widget.debug = true;
-
       const logSpy = jest.spyOn(console, 'log');
 
       class Test extends Widget { }

@@ -203,6 +203,20 @@ class Widget extends EventSource {
     }
   }
 
+  get rootHeight() {
+    if (this.parent) {
+      return this.parent.rootHeight;
+    }
+    return this.container.h;
+  }
+
+  get rootWidth() {
+    if (this.parent) {
+      return this.parent.rootWidth;
+    }
+    return this.container.w;
+  }
+
   // #region Position and Size
 
   /**

@@ -23,7 +23,6 @@ class ModalDialog extends Widget {
 
     this._manualPosition = true;
 
-    this.#modalRoot.container = [0, 0, global.window.width, global.window.height];
     this.#shade.order = 1;
     this.#modalVerticalCenter.order = 2;
     this.#modalVerticalCenter.orientation = Container.Orientation.Vertical;
@@ -99,6 +98,7 @@ class ModalDialog extends Widget {
   }
 
   _preDraw() {
+    this.#modalRoot.container = [0, 0, this.rootWidth, this.rootHeight];
     this.#modalRoot._preDraw();
     super._preDraw();
   }

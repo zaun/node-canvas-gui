@@ -16,7 +16,6 @@ class Shade extends Container {
 
     this._manualPosition = true;
     this.color = Colors.Black;
-    this.container = [0, 0, global.window.width, global.window.height];
 
     this.onMouseClick = () => true;
 
@@ -55,6 +54,8 @@ class Shade extends Container {
     if (this.constructor.name === 'Shade') {
       this._logme(depth);
     }
+
+    this.container = [0, 0, this.rootWidth, this.rootHeight];
 
     let opacity = (256 * (1 - this.#opacity)).toString(16);
     if (opacity.length === 1) {
