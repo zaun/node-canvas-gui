@@ -13,7 +13,7 @@ export default () => {
   // Split the view for a top tab bar
   const view = new Container();
   view.orientation = Container.Orientation.Vertical;
-  view.autoHeight = true;
+  view.autoSize = true;
 
   const sectionA = new Text();
   sectionA.parent = view;
@@ -29,18 +29,18 @@ Use custom button styles for actions in forms, dialogs, and more with support fo
   exampleAButtons.orientation = Container.Orientation.Vertical;
   exampleAButtons.spacing = 5;
   exampleAButtons.padding = 5;
-  exampleAButtons.autoHeight = true;
+  exampleAButtons.autoSize = true;
   // exampleAButtons.parent = view;
 
   const bar1 = new Container(exampleAButtons);
   bar1.orientation = Container.Orientation.Horizontal;
   bar1.justifyItems = Container.JustifyItems.Center;
-  bar1.autoHeight = true;
+  bar1.autoSize = true;
 
   const bar2 = new Container(exampleAButtons);
   bar2.orientation = Container.Orientation.Horizontal;
   bar2.justifyItems = Container.JustifyItems.Center;
-  bar2.autoHeight = true;
+  bar2.autoSize = true;
 
   ['Blue', 'Cyan', 'Green', 'Indigo', 'Orange', 'Pink'].forEach((c) => {
     const b = new Button(bar1);
@@ -99,17 +99,17 @@ In need of a button, but not the hefty background colors they bring? Set the mod
   exampleBButtons.orientation = Container.Orientation.Vertical;
   exampleBButtons.spacing = 5;
   exampleBButtons.padding = 5;
-  exampleBButtons.autoHeight = true;
+  exampleBButtons.autoSize = true;
 
   const barB1 = new Container(exampleBButtons);
   barB1.orientation = Container.Orientation.Horizontal;
   barB1.justifyItems = Container.JustifyItems.Center;
-  barB1.autoHeight = true;
+  barB1.autoSize = true;
 
   const barB2 = new Container(exampleBButtons);
   barB2.orientation = Container.Orientation.Horizontal;
   barB2.justifyItems = Container.JustifyItems.Center;
-  barB2.autoHeight = true;
+  barB2.autoSize = true;
 
   ['Blue', 'Cyan', 'Green', 'Indigo', 'Orange', 'Pink'].forEach((c) => {
     const b = new Button(barB1);
@@ -172,7 +172,7 @@ bar2.justifyItems = Container.JustifyItems.Center;
   exampleCButtons.orientation = Container.Orientation.Horizontal;
   exampleCButtons.justifyItems = Container.JustifyItems.Center;
   exampleCButtons.padding = 5;
-  exampleCButtons.autoHeight = true;
+  exampleCButtons.autoSize = true;
 
   ['Large', 'Medium', 'Small'].forEach((s) => {
     const b = new Button(exampleCButtons);

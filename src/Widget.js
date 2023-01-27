@@ -284,6 +284,15 @@ class Widget extends EventSource {
     }
   }
 
+  get _bounds() {
+    return {
+      x: this.#container.x,
+      y: this.#container.y,
+      w: this.#container.w,
+      h: this.#container.h,
+    };
+  }
+
   get fixedHeight() {
     if (this.#fixedHeight instanceof Widget) {
       return this.#fixedHeight.container.h;
@@ -478,10 +487,12 @@ class Widget extends EventSource {
 
   // eslint-disable-next-line class-methods-use-this
   _postDraw() {
-    // canvasCtx.beginPath();
-    // canvasCtx.strokeStyle = '#000000';
-    // canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
-    // canvasCtx.stroke();
+    // if (this.name === 'TEST') {
+    //   canvasCtx.beginPath();
+    //   canvasCtx.strokeStyle = '#0000BB';
+    //   canvasCtx.rect(this.container.x, this.container.y, this.container.w, this.container.h);
+    //   canvasCtx.stroke();
+    // }
   }
 
   /**

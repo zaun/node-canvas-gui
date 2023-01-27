@@ -53,7 +53,7 @@ class Container extends Widget {
   #spacing = 5;
   #alignItems = Container.AlignItems.Center;
   #justifyItems = Container.JustifyItems.Start;
-  #autoHeight = false;
+  #autoSize = false;
 
   /**
    * Create a new Container.
@@ -83,6 +83,12 @@ class Container extends Widget {
 
     if (this._orientation !== val) {
       this._orientation = val;
+
+      if (this.autoSize) {
+        this.fixedHeight = 0;
+        this.fixedWidth = 0;
+      }
+
       this._performLayout();
     }
   }
@@ -137,31 +143,27 @@ class Container extends Widget {
     this._performLayout();
   }
 
-  get autoHeight() {
-    return this.#autoHeight;
+  get autoSize() {
+    return this.#autoSize;
   }
 
   /**
    * When true automatically set the widget height to the size
    * of the content. All child widgets must had a fixedHieght
-   * set or have autoHeight set. When false widget will be
+   * set or have autoSize set. When false widget will be
    * sized by it's parent.
    * @type {Boolean}
    */
-  set autoHeight(val) {
+  set autoSize(val) {
     if (typeof val !== 'boolean') {
       throw new Error('Value must be Boolean');
     }
 
-    // If changing from fixed to unfixed then clear the
-    // current fixedHeight and update everything.
-    if (this.#autoHeight && !val) {
-      this.#autoHeight = val;
-      this.fixedHeight = 0;
-    } else {
-      this.#autoHeight = val;
-      this._performLayout();
-    }
+    this.fixedHeight = 0;
+    this.fixedWidth = 0;
+
+    this.#autoSize = val;
+    this._performLayout();
   }
 
   /**
@@ -196,23 +198,33 @@ class Container extends Widget {
     let children = [];
     let totalItemWidth = 0;
     let totalItemHeight = 0;
-    let totalHeight = 0;
     let maxHeight = 0;
+    let maxWidth = 0;
+    let autoSizeFixedCount = 0;
+    let shouldAutoSize = false;
 
     switch (this.orientation) {
       case Container.Orientation.Horizontal:
         if (this.#children.length === 0) {
           return;
         }
-        if (this.body.h === 0 && !this.autoHeight) {
+        if (this.body.h === 0 && !this.autoSize) {
           return;
         }
 
         // Exclude manually positioned children and
-        // and children without a fixedHeight if Container is set to autoHeight
-        children = this.#sortedChildren
+        // and children without a fixedHeight if Container is set to autoSize
+        autoSizeFixedCount = this.#sortedChildren
           .filter((i) => i._manualPosition === false)
-          .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
+          .filter((i) => !this.autoSize || (this.autoSize && i.fixedHeight !== 0))
+          .length;
+        children = this.#sortedChildren
+          .filter((i) => i._manualPosition === false);
+
+        shouldAutoSize = this.#autoSize;
+        if (autoSizeFixedCount === 0) {
+          shouldAutoSize = false;
+        }
 
         children.forEach((w) => {
           fixed += w.fixedWidth;
@@ -221,7 +233,7 @@ class Container extends Widget {
             gridCount += w.grow;
           }
 
-          if (this.#autoHeight && maxHeight < w.fixedHeight) {
+          if (shouldAutoSize && maxHeight < w.fixedHeight) {
             maxHeight = w.fixedHeight;
           }
         });
@@ -238,6 +250,9 @@ class Container extends Widget {
           }
         }
         childHeight = this.body.h;
+        if (shouldAutoSize) {
+          childHeight = maxHeight;
+        }
 
         children.forEach((w) => {
           const itemWidth = Math.floor(w.fixedWidth === 0 ? w.grow * childWidth : w.fixedWidth);
@@ -264,9 +279,7 @@ class Container extends Widget {
           } else if (this.#justifyItems === Container.JustifyItems.End) {
             x += extraSpace;
           } else if (this.#justifyItems === Container.JustifyItems.Between) {
-            if (idx < children.length) {
-              x += (extraSpace / (children.length - 1)) * idx;
-            }
+            x += (extraSpace / (children.length - 1)) * idx;
           } else if (this.#justifyItems === Container.JustifyItems.Around) {
             x += (extraSpace / (children.length + 1)) * (idx + 1);
           }
@@ -277,7 +290,7 @@ class Container extends Widget {
           offset += newWidth + this.#spacing;
         });
 
-        if (this.#autoHeight && this.fixedHeight !== maxHeight + this.padding.t + this.padding.b) {
+        if (shouldAutoSize && this.fixedHeight !== maxHeight + this.padding.t + this.padding.b) {
           this.fixedHeight = maxHeight + this.padding.t + this.padding.b;
           if (this.parent) {
             this.parent._performLayout();
@@ -285,21 +298,35 @@ class Container extends Widget {
             this._performLayout();
           }
         }
+
+        if (this.autoSize && this._bounds.w < totalItemWidth) {
+          this.fixedWidth = totalItemHeight;
+        } else if (this.autoSize && this._bounds.w > totalItemWidth) {
+          this.fixedWidth = 0;
+        }
         break;
 
       case Container.Orientation.Vertical:
         if (this.#children.length === 0) {
           return;
         }
-        if (this.body.h === 0 && !this.autoHeight) {
+        if (this.body.w === 0 && !this.autoSize) {
           return;
         }
 
         // Exclude manually positioned children and
-        // and children without a fixedHeight if Container is set to autoHeight
-        children = this.#sortedChildren
+        // and children without a fixedHeight if Container is set to autoSize
+        autoSizeFixedCount = this.#sortedChildren
           .filter((i) => i._manualPosition === false)
-          .filter((i) => !this.autoHeight || (this.autoHeight && i.fixedHeight !== 0));
+          .filter((i) => !this.autoSize || (this.autoSize && i.fixedWidth !== 0))
+          .length;
+        children = this.#sortedChildren
+          .filter((i) => i._manualPosition === false);
+
+        shouldAutoSize = this.#autoSize;
+        if (autoSizeFixedCount === 0) {
+          shouldAutoSize = false;
+        }
 
         children.forEach((w) => {
           fixed += w.fixedHeight;
@@ -308,17 +335,14 @@ class Container extends Widget {
             gridCount += w.grow;
           }
 
-          if (this.#autoHeight) {
-            totalHeight += w.fixedHeight;
+          if (shouldAutoSize && maxWidth < w.fixedWidth) {
+            maxWidth = w.fixedWidth;
           }
         });
 
         totalSpacing = (this.#spacing * (childCount - 1));
         if (totalSpacing < 0) {
           totalSpacing = 0;
-        }
-        if (this.#autoHeight) {
-          totalHeight += totalSpacing;
         }
 
         if (gridCount > 0) {
@@ -328,6 +352,9 @@ class Container extends Widget {
           }
         }
         childWidth = this.body.w;
+        if (shouldAutoSize) {
+          childWidth = maxWidth;
+        }
 
         children.forEach((w) => {
           const itemHeight = Math.floor(w.fixedHeight === 0 ? w.grow * childHeight : w.fixedHeight);
@@ -354,35 +381,30 @@ class Container extends Widget {
           } else if (this.#justifyItems === Container.JustifyItems.End) {
             y += extraSpace;
           } else if (this.#justifyItems === Container.JustifyItems.Between) {
-            if (idx < children.length) {
-              y += (extraSpace / (children.length - 1)) * idx;
-            }
+            y += (extraSpace / (children.length - 1)) * idx;
           } else if (this.#justifyItems === Container.JustifyItems.Around) {
             y += (extraSpace / (children.length + 1)) * (idx + 1);
           }
 
-          if (w.fixedHeight === 0) {
-            const newHeight = w.grow * childHeight;
-            // eslint-disable-next-line no-param-reassign
-            w.container = [x, y + offset, childWidth, newHeight];
-            offset += newHeight + this.#spacing;
-          } else {
-            // eslint-disable-next-line no-param-reassign
-            w.container = [x, y + offset, childWidth, w.fixedHeight];
-            offset += w.fixedHeight + this.#spacing;
-          }
+          const newHeight = w.fixedHeight === 0 ? w.grow * childHeight : w.fixedHeight;
+          // eslint-disable-next-line no-param-reassign
+          w.container = [x, y + offset, childWidth, newHeight];
+          offset += newHeight + this.#spacing;
         });
 
-        if (
-          this.#autoHeight
-          && this.fixedHeight !== totalHeight + this.padding.t + this.padding.b
-        ) {
-          this.fixedHeight = totalHeight + this.padding.t + this.padding.b;
+        if (shouldAutoSize && this.fixedWidth !== maxWidth + this.padding.r + this.padding.l) {
+          this.fixedWidth = maxWidth + this.padding.r + this.padding.l;
           if (this.parent) {
             this.parent._performLayout();
           } else {
             this._performLayout();
           }
+        }
+
+        if (this.autoSize && this._bounds.h < totalItemHeight) {
+          this.fixedHeight = totalItemHeight;
+        } else if (this.autoSize && this._bounds.h > totalItemHeight) {
+          this.fixedHeight = 0;
         }
         break;
 
@@ -399,7 +421,6 @@ class Container extends Widget {
           // eslint-disable-next-line no-param-reassign
           w.container = [this.body.x, this.body.y, this.body.w, this.body.h];
         });
-
         break;
 
       default:
@@ -505,6 +526,7 @@ class Container extends Widget {
       // canvasCtx.strokeStyle = '#333333';
       // canvasCtx.strokeRect(w.container.x, w.container.y, w.container.w, w.container.h);
     });
+    super._postDraw(canvasCtx, depth);
   }
 }
 

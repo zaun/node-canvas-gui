@@ -20,12 +20,12 @@ export default () => {
   screen.orientation = Container.Orientation.Vertical;
 
   const display = new Container(screen);
-  display.orientation = Container.Orientation.Horizontal;
+  display.orientation = Container.Orientation.Vertical;
 
   // Default example
 
   const basic = new Container(display);
-  basic.orientation = Container.Orientation.Vertical;
+  basic.orientation = Container.Orientation.Horizontal;
 
   // const basicLabel = new Label(basic);
   // basicLabel.text = 'Basic Example';
@@ -43,7 +43,7 @@ export default () => {
   // Grow property example
 
   const grow = new Container(display);
-  grow.orientation = Container.Orientation.Vertical;
+  grow.orientation = Container.Orientation.Horizontal;
   const itemD = createItem('A\nGrow = 1', Colors.Blue);
   itemD.parent = grow;
   itemD.grow = 1;
@@ -59,7 +59,7 @@ export default () => {
   // Sort property example
 
   const sort = new Container(display);
-  sort.orientation = Container.Orientation.Vertical;
+  sort.orientation = Container.Orientation.Horizontal;
   const itemG = createItem('A\nSort = 3', Colors.Teal);
   itemG.parent = sort;
   itemG.order = 3;
@@ -72,10 +72,10 @@ export default () => {
   itemI.parent = sort;
   itemI.order = 1;
 
-  // Sort fixed example
+  // Fixed example
 
   const fixed = new Container(display);
-  fixed.orientation = Container.Orientation.Vertical;
+  fixed.orientation = Container.Orientation.Horizontal;
   const itemJ = createItem('A', Colors.Orange);
   itemJ.parent = fixed;
   itemJ.fixedHeight = 50;
@@ -91,38 +91,66 @@ export default () => {
   itemL.fixedHeight = 50;
   itemL.fixedWidth = 50;
 
+  // Auto size example
+
+  const auto = new Container(display);
+  auto.orientation = Container.Orientation.Horizontal;
+  auto.autoSize = true;
+  const itemM = createItem('A', Colors.Orange);
+  itemM.parent = auto;
+  itemM.fixedHeight = 50;
+  itemM.fixedWidth = 50;
+
+  const itemN = createItem('B', Colors.Orange);
+  itemN.parent = auto;
+  itemN.fixedHeight = 75;
+  itemN.fixedWidth = 75;
+
+  const itemO = createItem('C', Colors.Orange);
+  itemO.parent = auto;
+
+  const buttonBar = new Container(screen);
+  buttonBar.orientation = Container.Orientation.Vertical;
+  buttonBar.autoSize = true;
+
   // Add orientation options
-  const orientationContainer = new Container(screen);
+  const orientationContainer = new Container(buttonBar);
   orientationContainer.orientation = Container.Orientation.Horizontal;
-  orientationContainer.autoHeight = true;
+  orientationContainer.autoSize = true;
+
   const orientationItems = Object.keys(Container.Orientation);
   const orientationButtons = {};
   orientationItems.forEach((item) => {
     const btn = new Button(orientationContainer);
     btn.setColor(Colors.Cyan);
-    if (Container.Orientation[item] === display.orientation) {
+    if (Container.Orientation[item] === basic.orientation) {
       btn.setColor(Colors.Green);
     }
 
     orientationButtons[item] = btn;
     btn.text = item;
     btn.onMouseClick = () => {
-      display.orientation = Container.Orientation[item];
       if (item === 'Horizontal') {
-        basic.orientation = Container.Orientation.Vertical;
-        grow.orientation = Container.Orientation.Vertical;
-        sort.orientation = Container.Orientation.Vertical;
-        fixed.orientation = Container.Orientation.Vertical;
-      } else if (item === 'Vertical') {
+        display.orientation = Container.Orientation.Vertical;
         basic.orientation = Container.Orientation.Horizontal;
         grow.orientation = Container.Orientation.Horizontal;
         sort.orientation = Container.Orientation.Horizontal;
         fixed.orientation = Container.Orientation.Horizontal;
+        auto.orientation = Container.Orientation.Horizontal;
+      } else if (item === 'Vertical') {
+        display.orientation = Container.Orientation.Horizontal;
+        basic.orientation = Container.Orientation.Vertical;
+        grow.orientation = Container.Orientation.Vertical;
+        sort.orientation = Container.Orientation.Vertical;
+        fixed.orientation = Container.Orientation.Vertical;
+        auto.orientation = Container.Orientation.Vertical;
       } else if (item === 'Stack') {
+        display.orientation = Container.Orientation.Stack;
         basic.orientation = Container.Orientation.Vertical;
         grow.orientation = Container.Orientation.Horizontal;
         sort.orientation = Container.Orientation.Vertical;
         fixed.orientation = Container.Orientation.Horizontal;
+        auto.orientation = Container.Orientation.Vertical;
       }
 
       orientationItems.forEach((i) => {
@@ -136,9 +164,9 @@ export default () => {
   });
 
   // Add justify options
-  const justifyContainer = new Container(screen);
+  const justifyContainer = new Container(buttonBar);
   justifyContainer.orientation = Container.Orientation.Horizontal;
-  justifyContainer.autoHeight = true;
+  justifyContainer.autoSize = true;
   const justifyItems = Object.keys(Container.JustifyItems);
   const justifyButtons = {};
   justifyItems.forEach((item) => {
@@ -155,6 +183,7 @@ export default () => {
       grow.justifyItems = Container.JustifyItems[item];
       sort.justifyItems = Container.JustifyItems[item];
       fixed.justifyItems = Container.JustifyItems[item];
+      auto.justifyItems = Container.JustifyItems[item];
 
       justifyItems.forEach((i) => {
         if (i === item) {
@@ -167,9 +196,9 @@ export default () => {
   });
 
   // Add align options
-  const alignContainer = new Container(screen);
+  const alignContainer = new Container(buttonBar);
   alignContainer.orientation = Container.Orientation.Horizontal;
-  alignContainer.autoHeight = true;
+  alignContainer.autoSize = true;
   const alignItems = Object.keys(Container.AlignItems);
   const alignButtons = {};
   alignItems.forEach((item) => {
@@ -186,6 +215,7 @@ export default () => {
       grow.alignItems = Container.AlignItems[item];
       sort.alignItems = Container.AlignItems[item];
       fixed.alignItems = Container.AlignItems[item];
+      auto.alignItems = Container.AlignItems[item];
 
       alignItems.forEach((i) => {
         if (i === item) {

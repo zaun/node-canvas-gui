@@ -19,9 +19,9 @@ export default () => {
   screen.addChild(lblA);
   screen.addChild(lblB);
 
-  const buttonBar = new Container(null, 'Button Bar');
+  const buttonBar = new Container(screen);
   buttonBar.orientation = Container.Orientation.Vertical;
-  buttonBar.autoHeight = true;
+  buttonBar.autoSize = true;
 
   let row = new Container(buttonBar, 'Font Justification Change Bar');
   row.fixedHeight = 40;
@@ -92,8 +92,6 @@ export default () => {
       lblB.font = Fonts[font];
     };
   });
-
-  buttonBar.parent = screen;
 
   return screen;
 };

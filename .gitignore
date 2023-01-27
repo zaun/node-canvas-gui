@@ -3,3 +3,6 @@ node_modules/
 coverage/
 docs/
 .DS_Store
+
+# unit test image fail diffs
+__diff_output__/

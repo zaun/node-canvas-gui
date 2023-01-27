@@ -9,7 +9,7 @@ const createExample = (exampleWidget, exampleCode) => {
   const example = new Container();
   example.spacing = 0;
   example.padding = 0;
-  example.autoHeight = true;
+  example.autoSize = true;
   example.orientation = Container.Orientation.Vertical;
 
   const exampleContentPanel = new Panel(null, 'ExampleContentPanel');
@@ -17,14 +17,14 @@ const createExample = (exampleWidget, exampleCode) => {
   exampleContentPanel.padding = 5;
   exampleContentPanel.radii = [8, 8, 0, 0];
   exampleContentPanel.setColor(Colors.White);
-  exampleContentPanel.autoHeight = true;
+  exampleContentPanel.autoSize = true;
   exampleContentPanel.parent = example;
 
   const exampleContent = new Container(null, 'ExampleContent');
   exampleContent.spacing = 0;
   exampleContent.orientation = Container.Orientation.Vertical;
   exampleContent.parent = exampleContentPanel;
-  exampleContent.autoHeight = true;
+  exampleContent.autoSize = true;
 
   if (exampleWidget !== null) {
     // eslint-disable-next-line no-param-reassign
@@ -37,7 +37,7 @@ const createExample = (exampleWidget, exampleCode) => {
   exampleCodePanel.radii = [0, 0, 8, 8];
   exampleCodePanel.setColor(Colors.darker(Colors.White));
   exampleCodePanel.borderColor = exampleContentPanel.borderColor;
-  exampleCodePanel.autoHeight = true;
+  exampleCodePanel.autoSize = true;
   exampleCodePanel.parent = example;
 
   const exampleText = new Text(null, 'ExampleText');
