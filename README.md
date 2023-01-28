@@ -17,7 +17,7 @@ import {
   Panel,
   Label,
   Button,
-} from 'node-sdl';
+} from 'node-canvas-gui';
 
 // Create window
 global.window = sdl.video.createWindow({
