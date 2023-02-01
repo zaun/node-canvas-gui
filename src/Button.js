@@ -9,17 +9,30 @@ import Widget from './Widget.js';
  * @extends Widget
  */
 class Button extends Widget {
-  static Mode = {
+  static #Mode = {
     Default: 'Default',
     Outline: 'Outline',
     Link: 'Link',
   };
 
-  static Size = {
+  static #Size = {
     Large: 'Large',
     Medium: 'Medium',
     Small: 'Small',
   };
+
+  static get Mode() {
+    return this.#Mode;
+  }
+
+  static get Size() {
+    return this.#Size;
+  }
+
+  static {
+    Object.preventExtensions(this.#Mode);
+    Object.preventExtensions(this.#Size);
+  }
 
   #borderColor = '';
   #borderWidth = 2;
@@ -51,7 +64,7 @@ class Button extends Widget {
     this.setSize(Button.Size.Medium);
     this.setColor(Colors.Blue);
 
-    if (new.target === Button) {
+    if (new.target === Button && !Widget.testing) {
       Object.preventExtensions(this);
     }
   }
@@ -110,8 +123,14 @@ class Button extends Widget {
   }
 
   set mode(val) {
-    this.#mode = val;
-    this._performLayout();
+    if (!Object.values(Button.Mode).includes(val)) {
+      throw new Error('Invalid Mode');
+    }
+
+    if (this.#mode !== val) {
+      this.#mode = val;
+      this._performLayout();
+    }
   }
 
   get mode() {
